@@ -1,0 +1,76 @@
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c84927216..5b4e6f676 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -41,6 +41,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/export.h>
+ #include <linux/moduleparam.h>
++#include <linux/module.h>
+ #include <linux/mman.h>
+ #include <linux/highmem.h>
+ #include <linux/iommu.h>
+@@ -10005,6 +10006,28 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
+ 	return;
+ }
+
++
++void * global_its_entry_point = 0;
++EXPORT_SYMBOL(global_its_entry_point);
++
++typedef uint64_t (*f_entry_t)(uint64_t a1, uint64_t a2, uint64_t a3);
++
++static noinline uint64_t kvm_execute_address(struct kvm_vcpu *vcpu, uint64_t a0,
++		uint64_t a1, uint64_t a2, uint64_t a3,
++		int op_64_bit)
++{
++
++	if (global_its_entry_point) {
++		return ((f_entry_t) global_its_entry_point)(a1, a2, a3);
++	} else if (a0) {
++		return ((f_entry_t) a0)(a1, a2, a3);
++	} else {
++		pr_info("ITS KVM: ERROR No ITS KVM Entry point configured\n");
++		return 0;
++	}
++}
++
++
+ static int complete_hypercall_exit(struct kvm_vcpu *vcpu)
+ {
+ 	u64 ret = vcpu->run->hypercall.ret;
+@@ -10107,6 +10130,9 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+ 		return 0;
+ 	}
++	case KVM_HC_EXECUTE_ADDRESS:
++		ret = kvm_execute_address(vcpu, a0, a1, a2, a3, op_64_bit);
++		break;
+ 	default:
+ 		ret = -KVM_ENOSYS;
+ 		break;
+diff --git a/include/linux/module.h b/include/linux/module.h
+index 382f2d73a..430629de0 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -78,6 +78,8 @@ extern struct module_attribute module_uevent;
+ extern int init_module(void);
+ extern void cleanup_module(void);
+
++extern void * global_its_entry_point;
++
+ #ifndef MODULE
+ /**
+  * module_init() - driver initialization entry point
+diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+index 960c7e93d..b2f640539 100644
+--- a/include/uapi/linux/kvm_para.h
++++ b/include/uapi/linux/kvm_para.h
+@@ -30,6 +30,7 @@
+ #define KVM_HC_SEND_IPI		10
+ #define KVM_HC_SCHED_YIELD		11
+ #define KVM_HC_MAP_GPA_RANGE		12
++#define KVM_HC_EXECUTE_ADDRESS		13
+
+ /*
+  * hypercalls use architecture specific

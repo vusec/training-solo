@@ -1,0 +1,2845 @@
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_evict_ind_btb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_evict_ind_btb
+model name	: Intel(R) Core(TM) Ultra 7 258V
+cpu family	: 6
+model		: 189
+stepping	: 1
+microcode	: 0x111
+Linux version   : 6.8.0-38-generic
+Linux spectre_v2 mitigation info:
+- Enhanced / Automatic IBRS; IBPB: conditional; RSB filling; PBRSB-eIBRS: Not affected; BHI: Not affected
+Running on CPU: 4
+============================ ENVIRONMENT INFO ============================
+======================== HARDWARE MITIGATION INFO ========================
+     IBRS/IBPB Support:  0 |
+         eIBRS Support:  1 |          eIBRS Enabled:  1
+                  RSBA:  0 |
+                 RRSBA:  1 |
+       CET_IBT Support:  1 |        IBT Kernel-mode:  0
+                           |          IBT User-mode:  0
+            IPRED_CTRL:  1 |            IPRED_DIS_S:  0
+            RRSBA_CTRL:  1 |            RRSBA_DIS_S:  0
+                           |            RRSBA_DIS_U:  0
+              DDP_CTRL:  1 |                 DDPD_U:  0
+              BHI_CTRL:  1 |              BHI_DIS_S:  0
+                BHI_NO:  1 |
+Seed: 1740652469
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type:     NONE
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x55fade82a3ac (tag: 0x282, set: 0x28e, PC[5:0]: 0x02c)
+         victim: 0x69781682a389 (tag: 0x282, set: 0x28e, PC[5:0]: 0x009)
+
+        target0: 0x55fade82a5ac (offset: 0x200)
+   target1_mock: 0x69781683b389 (offset: 0x11000)
+  target1_short: 0x69781682a5ac (offset: 0x223)
+   target1_near: 0x6978de82a5ac (offset: 0xc8000223)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x205750b7a38c (tag: 0x0b7, set: 0x28e, PC[5:0]: 0x00c)
+  BTB Evict set: 0x20fced84a389 (tag: 0x184, set: 0x28e, PC[5:0]: 0x009)
+  BTB Evict set: 0x20bf2461a391 (tag: 0x061, set: 0x28e, PC[5:0]: 0x011)
+  BTB Evict set: 0x207473cea3b9 (tag: 0x3ce, set: 0x28e, PC[5:0]: 0x039)
+  BTB Evict set: 0x2066ccc5a3a1 (tag: 0x0c5, set: 0x28e, PC[5:0]: 0x021)
+  BTB Evict set: 0x20978210a3b4 (tag: 0x210, set: 0x28e, PC[5:0]: 0x034)
+  BTB Evict set: 0x204ff5aea391 (tag: 0x1ae, set: 0x28e, PC[5:0]: 0x011)
+  BTB Evict set: 0x2001df4fa395 (tag: 0x34f, set: 0x28e, PC[5:0]: 0x015)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_evict_ind_btb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_evict_ind_btb
+model name	: Intel(R) Core(TM) Ultra 7 258V
+cpu family	: 6
+model		: 189
+stepping	: 1
+microcode	: 0x111
+Linux version   : 6.8.0-38-generic
+Linux spectre_v2 mitigation info:
+- Enhanced / Automatic IBRS; IBPB: conditional; RSB filling; PBRSB-eIBRS: Not affected; BHI: Not affected
+Running on CPU: 4
+============================ ENVIRONMENT INFO ============================
+======================== HARDWARE MITIGATION INFO ========================
+     IBRS/IBPB Support:  0 |
+         eIBRS Support:  1 |          eIBRS Enabled:  1
+                  RSBA:  0 |
+                 RRSBA:  1 |
+       CET_IBT Support:  1 |        IBT Kernel-mode:  0
+                           |          IBT User-mode:  0
+            IPRED_CTRL:  1 |            IPRED_DIS_S:  0
+            RRSBA_CTRL:  1 |            RRSBA_DIS_S:  0
+                           |            RRSBA_DIS_U:  0
+              DDP_CTRL:  1 |                 DDPD_U:  0
+              BHI_CTRL:  1 |              BHI_DIS_S:  0
+                BHI_NO:  1 |
+Seed: 1740652476
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type:     NONE
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5eda63a209ea (tag: 0x3a2, set: 0x027, PC[5:0]: 0x02a)
+         victim: 0x62231fa209d7 (tag: 0x3a2, set: 0x027, PC[5:0]: 0x017)
+
+        target0: 0x5eda63a20bea (offset: 0x200)
+   target1_mock: 0x62231fa319d7 (offset: 0x11000)
+  target1_short: 0x62231fa20bea (offset: 0x213)
+   target1_near: 0x622363a20bea (offset: 0x44000213)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x20c76fb709fb (tag: 0x3b7, set: 0x027, PC[5:0]: 0x03b)
+  BTB Evict set: 0x202c5b1909dc (tag: 0x319, set: 0x027, PC[5:0]: 0x01c)
+  BTB Evict set: 0x2073896b09c7 (tag: 0x16b, set: 0x027, PC[5:0]: 0x007)
+  BTB Evict set: 0x20dac27e09e8 (tag: 0x27e, set: 0x027, PC[5:0]: 0x028)
+  BTB Evict set: 0x20ae29b209f9 (tag: 0x1b2, set: 0x027, PC[5:0]: 0x039)
+  BTB Evict set: 0x207d074809c8 (tag: 0x348, set: 0x027, PC[5:0]: 0x008)
+  BTB Evict set: 0x20eeaae009d4 (tag: 0x2e0, set: 0x027, PC[5:0]: 0x014)
+  BTB Evict set: 0x20640bbc09fc (tag: 0x3bc, set: 0x027, PC[5:0]: 0x03c)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_call_jmp_collision #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_call_jmp_collision -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652483
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type:   STATIC |    Victim History type:   STATIC
+  Training Branch Type: IND_CALL |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x53905443678a (tag: 0x043, set: 0x19e, PC[5:0]: 0x00a)
+         victim: 0x60784843678a (tag: 0x043, set: 0x19e, PC[5:0]: 0x00a)
+
+        target0: 0x53905443698a (offset: 0x200)
+   target1_mock: 0x60784844778a (offset: 0x11000)
+  target1_short: 0x60784843698a (offset: 0x200)
+   target1_near: 0x60785443698a (offset: 0xc000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_call_jmp_collision #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_call_jmp_collision -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652485
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type:   STATIC |    Victim History type:   STATIC
+  Training Branch Type: IND_CALL |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5ee4cb0c41a8 (tag: 0x30c, set: 0x106, PC[5:0]: 0x028)
+         victim: 0x66bb130c41a8 (tag: 0x30c, set: 0x106, PC[5:0]: 0x028)
+
+        target0: 0x5ee4cb0c43a8 (offset: 0x200)
+   target1_mock: 0x66bb130d51a8 (offset: 0x11000)
+  target1_short: 0x66bb130c43a8 (offset: 0x200)
+   target1_near: 0x66bbcb0c43a8 (offset: 0xb8000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_collision #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_collision -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652487
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:   STATIC |    Victim History type:   STATIC
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5217799c9cb4 (tag: 0x19c, set: 0x272, PC[5:0]: 0x034)
+         victim: 0x6efc459c9cb4 (tag: 0x19c, set: 0x272, PC[5:0]: 0x034)
+
+        target0: 0x5217799c9eb4 (offset: 0x200)
+   target1_mock: 0x6efc459dacb4 (offset: 0x11000)
+  target1_short: 0x6efc459c9eb4 (offset: 0x200)
+   target1_near: 0x6efc799c9eb4 (offset: 0x34000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   5803 ( 58.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    479 (  4.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   4740 ( 47.4%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   7874 ( 78.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   2540 ( 25.4%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_collision #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_collision -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652488
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:   STATIC |    Victim History type:   STATIC
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5f4cfde6346d (tag: 0x1e6, set: 0x0d1, PC[5:0]: 0x02d)
+         victim: 0x6cd029e6346d (tag: 0x1e6, set: 0x0d1, PC[5:0]: 0x02d)
+
+        target0: 0x5f4cfde6366d (offset: 0x200)
+   target1_mock: 0x6cd029e7446d (offset: 0x11000)
+  target1_short: 0x6cd029e6366d (offset: 0x200)
+   target1_near: 0x6cd0fde6366d (offset: 0xd4000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9992 ( 99.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9977 ( 99.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9989 ( 99.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9984 ( 99.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9985 ( 99.9%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_btb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652488
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5f4cfde6346d (tag: 0x1e6, set: 0x0d1, PC[5:0]: 0x02d)
+         victim: 0x6cd029e6346d (tag: 0x1e6, set: 0x0d1, PC[5:0]: 0x02d)
+
+        target0: 0x5f4cfde6366d (offset: 0x200)
+   target1_mock: 0x6cd029e7446d (offset: 0x11000)
+  target1_short: 0x6cd029e6366d (offset: 0x200)
+   target1_near: 0x6cd0fde6366d (offset: 0xd4000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x200db6083450 (tag: 0x208, set: 0x0d1, PC[5:0]: 0x010)
+  BTB Evict set: 0x20715ff93471 (tag: 0x3f9, set: 0x0d1, PC[5:0]: 0x031)
+  BTB Evict set: 0x201535f13467 (tag: 0x1f1, set: 0x0d1, PC[5:0]: 0x027)
+  BTB Evict set: 0x20884aa63441 (tag: 0x2a6, set: 0x0d1, PC[5:0]: 0x001)
+  BTB Evict set: 0x2074c10d347d (tag: 0x10d, set: 0x0d1, PC[5:0]: 0x03d)
+  BTB Evict set: 0x20e9a2d83447 (tag: 0x2d8, set: 0x0d1, PC[5:0]: 0x007)
+  BTB Evict set: 0x20095ce93467 (tag: 0x0e9, set: 0x0d1, PC[5:0]: 0x027)
+  BTB Evict set: 0x204ec191347d (tag: 0x191, set: 0x0d1, PC[5:0]: 0x03d)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_btb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652496
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5cbe82d31839 (tag: 0x2d3, set: 0x060, PC[5:0]: 0x039)
+         victim: 0x6afcb2d31839 (tag: 0x2d3, set: 0x060, PC[5:0]: 0x039)
+
+        target0: 0x5cbe82d31a39 (offset: 0x200)
+   target1_mock: 0x6afcb2d42839 (offset: 0x11000)
+  target1_short: 0x6afcb2d31a39 (offset: 0x200)
+   target1_near: 0x6afc82d31a39 (offset: 0x2ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x201cb24f182e (tag: 0x24f, set: 0x060, PC[5:0]: 0x02e)
+  BTB Evict set: 0x2058e25c1818 (tag: 0x25c, set: 0x060, PC[5:0]: 0x018)
+  BTB Evict set: 0x20d1d4b41837 (tag: 0x0b4, set: 0x060, PC[5:0]: 0x037)
+  BTB Evict set: 0x207ba3491838 (tag: 0x349, set: 0x060, PC[5:0]: 0x038)
+  BTB Evict set: 0x2056fb1e1839 (tag: 0x31e, set: 0x060, PC[5:0]: 0x039)
+  BTB Evict set: 0x20ec36731801 (tag: 0x273, set: 0x060, PC[5:0]: 0x001)
+  BTB Evict set: 0x20feb4321804 (tag: 0x032, set: 0x060, PC[5:0]: 0x004)
+  BTB Evict set: 0x20ddc567183f (tag: 0x167, set: 0x060, PC[5:0]: 0x03f)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_btb_ibtb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_btb_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652503
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5cf221889e0a (tag: 0x188, set: 0x278, PC[5:0]: 0x00a)
+         victim: 0x6a24e9889e0a (tag: 0x188, set: 0x278, PC[5:0]: 0x00a)
+
+        target0: 0x5cf22188a00a (offset: 0x200)
+   target1_mock: 0x6a24e989ae0a (offset: 0x11000)
+  target1_short: 0x6a24e988900a (offset: 0xe00)
+   target1_near: 0x6a242188a00a (offset: 0xc7fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x208e87379e31 (tag: 0x337, set: 0x278, PC[5:0]: 0x031)
+  BTB Evict set: 0x206a07739e1c (tag: 0x373, set: 0x278, PC[5:0]: 0x01c)
+  BTB Evict set: 0x204296f19e3a (tag: 0x2f1, set: 0x278, PC[5:0]: 0x03a)
+  BTB Evict set: 0x203f224d9e24 (tag: 0x24d, set: 0x278, PC[5:0]: 0x024)
+  BTB Evict set: 0x20a2ccf69e30 (tag: 0x0f6, set: 0x278, PC[5:0]: 0x030)
+  BTB Evict set: 0x2052438d9e33 (tag: 0x38d, set: 0x278, PC[5:0]: 0x033)
+  BTB Evict set: 0x208f66c79e11 (tag: 0x2c7, set: 0x278, PC[5:0]: 0x011)
+  BTB Evict set: 0x205372569e3f (tag: 0x256, set: 0x278, PC[5:0]: 0x03f)
+ iBTB Evict set: 0x34e45909858a (tag: 0x109, set: 0x216, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x3d77c490610a (tag: 0x090, set: 0x184, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x3ff0ffad708a (tag: 0x3ad, set: 0x1c2, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x332e49ce284a (tag: 0x1ce, set: 0x0a1, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x3b4aaae500ca (tag: 0x2e5, set: 0x003, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x3c2dcf97e20a (tag: 0x397, set: 0x388, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x3a2a8c42b34a (tag: 0x042, set: 0x2cd, PC[5:0]: 0x00a)
+ iBTB Evict set: 0x33dc8ca71e0a (tag: 0x0a7, set: 0x078, PC[5:0]: 0x00a)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_btb_ibtb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_btb_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652515
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x598a029862d1 (tag: 0x298, set: 0x18b, PC[5:0]: 0x011)
+         victim: 0x6ea5b69862d1 (tag: 0x298, set: 0x18b, PC[5:0]: 0x011)
+
+        target0: 0x598a029864d1 (offset: 0x200)
+   target1_mock: 0x6ea5b69972d1 (offset: 0x11000)
+  target1_short: 0x6ea5b69864d1 (offset: 0x200)
+   target1_near: 0x6ea5029864d1 (offset: 0xb3fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x2099d76062da (tag: 0x360, set: 0x18b, PC[5:0]: 0x01a)
+  BTB Evict set: 0x204f01d562c7 (tag: 0x1d5, set: 0x18b, PC[5:0]: 0x007)
+  BTB Evict set: 0x208aeac062f9 (tag: 0x2c0, set: 0x18b, PC[5:0]: 0x039)
+  BTB Evict set: 0x20dd57ff62c9 (tag: 0x3ff, set: 0x18b, PC[5:0]: 0x009)
+  BTB Evict set: 0x209334f962d4 (tag: 0x0f9, set: 0x18b, PC[5:0]: 0x014)
+  BTB Evict set: 0x20b4358762df (tag: 0x187, set: 0x18b, PC[5:0]: 0x01f)
+  BTB Evict set: 0x2028517d62cc (tag: 0x17d, set: 0x18b, PC[5:0]: 0x00c)
+  BTB Evict set: 0x202f18e162cb (tag: 0x0e1, set: 0x18b, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x3a52bb695651 (tag: 0x369, set: 0x159, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3052ba06cd51 (tag: 0x206, set: 0x335, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3c44fa4c6a51 (tag: 0x24c, set: 0x1a9, PC[5:0]: 0x011)
+ iBTB Evict set: 0x39836bf90211 (tag: 0x3f9, set: 0x008, PC[5:0]: 0x011)
+ iBTB Evict set: 0x329840f6e991 (tag: 0x0f6, set: 0x3a6, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3ffa41a3bad1 (tag: 0x1a3, set: 0x2eb, PC[5:0]: 0x011)
+ iBTB Evict set: 0x39b2189e2f51 (tag: 0x09e, set: 0x0bd, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3e11b082af11 (tag: 0x082, set: 0x2bc, PC[5:0]: 0x011)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_ibtb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652528
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5e1b31dcfdb3 (tag: 0x1dc, set: 0x3f6, PC[5:0]: 0x033)
+         victim: 0x6784addcfdb3 (tag: 0x1dc, set: 0x3f6, PC[5:0]: 0x033)
+
+        target0: 0x5e1b31dcffb3 (offset: 0x200)
+   target1_mock: 0x6784adde0db3 (offset: 0x11000)
+  target1_short: 0x6784addcffb3 (offset: 0x200)
+   target1_near: 0x678431dcffb3 (offset: 0x7bfffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x113e45dcfdb3 (tag: 0x1dc, set: 0x3f6, PC[5:0]: 0x033)
+ iBTB Evict set: 0x357e342d5eb3 (tag: 0x02d, set: 0x17a, PC[5:0]: 0x033)
+ iBTB Evict set: 0x33420dd64cf3 (tag: 0x1d6, set: 0x133, PC[5:0]: 0x033)
+ iBTB Evict set: 0x3439b671baf3 (tag: 0x271, set: 0x2eb, PC[5:0]: 0x033)
+ iBTB Evict set: 0x344d00ce2273 (tag: 0x0ce, set: 0x089, PC[5:0]: 0x033)
+ iBTB Evict set: 0x37222c33acf3 (tag: 0x033, set: 0x2b3, PC[5:0]: 0x033)
+ iBTB Evict set: 0x3b5763f7cf33 (tag: 0x3f7, set: 0x33c, PC[5:0]: 0x033)
+ iBTB Evict set: 0x348dc61e79b3 (tag: 0x21e, set: 0x1e6, PC[5:0]: 0x033)
+ iBTB Evict set: 0x30a1a7f550f3 (tag: 0x3f5, set: 0x143, PC[5:0]: 0x033)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)      4 ( 40.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_history_evict_ibtb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_history_evict_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652529
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5de721b4c2ac (tag: 0x1b4, set: 0x30a, PC[5:0]: 0x02c)
+         victim: 0x69fd79b4c2ac (tag: 0x1b4, set: 0x30a, PC[5:0]: 0x02c)
+
+        target0: 0x5de721b4c4ac (offset: 0x200)
+   target1_mock: 0x69fd79b5d2ac (offset: 0x11000)
+  target1_short: 0x69fd79b4c4ac (offset: 0x200)
+   target1_near: 0x69fd21b4c4ac (offset: 0x57fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x12d375b4c2ac (tag: 0x1b4, set: 0x30a, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x34027ef3a72c (tag: 0x2f3, set: 0x29c, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x37e5d158d66c (tag: 0x158, set: 0x359, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3d8abe6d5dec (tag: 0x26d, set: 0x177, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x394f3c69a5ac (tag: 0x069, set: 0x296, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x36343d01a6ec (tag: 0x101, set: 0x29b, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3fb9281032ec (tag: 0x010, set: 0x0cb, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x350e3df81cac (tag: 0x1f8, set: 0x072, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3da07c1c56ec (tag: 0x01c, set: 0x15b, PC[5:0]: 0x02c)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 7
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| bhi_dis_s_ind_ind_far #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dbhi_dis_s_ind_ind_far -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652530
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x508eb875ab1f (tag: 0x075, set: 0x2ac, PC[5:0]: 0x01f)
+         victim: 0x6b875075ab1f (tag: 0x075, set: 0x2ac, PC[5:0]: 0x01f)
+
+        target0: 0x518eb875aa7f (offset: 0xffffffff60)
+   target1_mock: 0x6b875076bb1f (offset: 0x11000)
+  target1_short: 0x6b875075aa7f (offset: 0xa0)
+   target1_near: 0x6b87b875aa7f (offset: 0x67ffff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)      0 (  0.0%)      3 ( 30.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      1 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| bhi_dis_s_ind_ind_far #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dbhi_dis_s_ind_ind_far -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652531
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x59014a6b016b (tag: 0x26b, set: 0x005, PC[5:0]: 0x02b)
+         victim: 0x6fa97a6b016b (tag: 0x26b, set: 0x005, PC[5:0]: 0x02b)
+
+        target0: 0x5a014a6b00cb (offset: 0xffffffff60)
+   target1_mock: 0x6fa97a6c116b (offset: 0x11000)
+  target1_short: 0x6fa97a6b00cb (offset: 0xa0)
+   target1_near: 0x6fa94a6b00cb (offset: 0x300000a0)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| bhi_dis_s_ind_ind_near #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dbhi_dis_s_ind_ind_near -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652533
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x575c699ba498 (tag: 0x19b, set: 0x292, PC[5:0]: 0x018)
+         victim: 0x66d0899ba498 (tag: 0x19b, set: 0x292, PC[5:0]: 0x018)
+
+        target0: 0x575c69dba3f8 (offset: 0x3fff60)
+   target1_mock: 0x66d0899cb498 (offset: 0x11000)
+  target1_short: 0x66d0899ba3f8 (offset: 0xa0)
+   target1_near: 0x66d069dba3f8 (offset: 0x1fc000a0)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| bhi_dis_s_ind_ind_near #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dbhi_dis_s_ind_ind_near -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652535
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x54259f89bcaf (tag: 0x389, set: 0x2f2, PC[5:0]: 0x02f)
+         victim: 0x62067789bcaf (tag: 0x389, set: 0x2f2, PC[5:0]: 0x02f)
+
+        target0: 0x54259fc9bc0f (offset: 0x3fff60)
+   target1_mock: 0x6206778accaf (offset: 0x11000)
+  target1_short: 0x62067789bc0f (offset: 0xa0)
+   target1_near: 0x62069fc9bc0f (offset: 0x283fff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| evict_ibtb_with_evict_branch #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Devict_ibtb_with_evict_branch -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652538
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5d14d273604c (tag: 0x273, set: 0x181, PC[5:0]: 0x00c)
+         victim: 0x673eee73604c (tag: 0x273, set: 0x181, PC[5:0]: 0x00c)
+
+        target0: 0x5d14d273624c (offset: 0x200)
+   target1_mock: 0x673eee74704c (offset: 0x11000)
+  target1_short: 0x673eee73624c (offset: 0x200)
+   target1_near: 0x673ed273624c (offset: 0x1bfffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1af12a73604c (tag: 0x273, set: 0x181, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3cc9f359eb0c (tag: 0x359, set: 0x3ac, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x303e1f1c3f8c (tag: 0x31c, set: 0x0fe, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x32b21028214c (tag: 0x028, set: 0x085, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3d84b76e664c (tag: 0x36e, set: 0x199, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x305b2a8dde4c (tag: 0x28d, set: 0x379, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3169cde0d64c (tag: 0x1e0, set: 0x359, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x367582dcae4c (tag: 0x2dc, set: 0x2b9, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3df570d8ab4c (tag: 0x0d8, set: 0x2ad, PC[5:0]: 0x00c)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   3272 ( 32.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   2855 ( 28.5%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    724 (  7.2%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      6 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   2675 ( 26.8%)      0 (  0.0%)  (/10000)
+Total iterations: 3
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| evict_ibtb_with_evict_branch #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Devict_ibtb_with_evict_branch -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652539
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5b54c3933160 (tag: 0x393, set: 0x0c5, PC[5:0]: 0x020)
+         victim: 0x6715d3933160 (tag: 0x393, set: 0x0c5, PC[5:0]: 0x020)
+
+        target0: 0x5b54c3933360 (offset: 0x200)
+   target1_mock: 0x6715d3944160 (offset: 0x11000)
+  target1_short: 0x6715d3933360 (offset: 0x200)
+   target1_near: 0x6715c3933360 (offset: 0xffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1c7cc7933160 (tag: 0x393, set: 0x0c5, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3ee5c180e6e0 (tag: 0x180, set: 0x39b, PC[5:0]: 0x020)
+ iBTB Evict set: 0x345470be6960 (tag: 0x0be, set: 0x1a5, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3072d35a6060 (tag: 0x35a, set: 0x181, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3ac4fa30e9e0 (tag: 0x230, set: 0x3a7, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3e8720d541a0 (tag: 0x0d5, set: 0x106, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3d39cfeceaa0 (tag: 0x3ec, set: 0x3aa, PC[5:0]: 0x020)
+ iBTB Evict set: 0x3ba7e374b7a0 (tag: 0x374, set: 0x2de, PC[5:0]: 0x020)
+ iBTB Evict set: 0x34536e0f7da0 (tag: 0x20f, set: 0x1f6, PC[5:0]: 0x020)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)     74 (  0.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     15 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     57 (  0.6%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     12 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     53 (  0.5%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| evict_ibtb_with_evict_set #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Devict_ibtb_with_evict_set -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652540
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x56bf5cbac5af (tag: 0x0ba, set: 0x316, PC[5:0]: 0x02f)
+         victim: 0x61cc2cbac5af (tag: 0x0ba, set: 0x316, PC[5:0]: 0x02f)
+
+        target0: 0x56bf5cbac7af (offset: 0x200)
+   target1_mock: 0x61cc2cbbd5af (offset: 0x11000)
+  target1_short: 0x61cc2cbac7af (offset: 0x200)
+   target1_near: 0x61cc5cbac7af (offset: 0x30000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x20f8e360c586 (tag: 0x360, set: 0x316, PC[5:0]: 0x006)
+  BTB Evict set: 0x20a8e895c5b6 (tag: 0x095, set: 0x316, PC[5:0]: 0x036)
+  BTB Evict set: 0x20916619c5a6 (tag: 0x219, set: 0x316, PC[5:0]: 0x026)
+  BTB Evict set: 0x206df455c5bc (tag: 0x055, set: 0x316, PC[5:0]: 0x03c)
+  BTB Evict set: 0x204af23fc5b3 (tag: 0x23f, set: 0x316, PC[5:0]: 0x033)
+  BTB Evict set: 0x20157b24c585 (tag: 0x324, set: 0x316, PC[5:0]: 0x005)
+  BTB Evict set: 0x2073e396c589 (tag: 0x396, set: 0x316, PC[5:0]: 0x009)
+  BTB Evict set: 0x20a5e9abc5b2 (tag: 0x1ab, set: 0x316, PC[5:0]: 0x032)
+ iBTB Evict set: 0x3d8c14c704ef (tag: 0x0c7, set: 0x013, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3168a3d0b42f (tag: 0x3d0, set: 0x2d0, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x370bdaf172ef (tag: 0x2f1, set: 0x1cb, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x351958a694ef (tag: 0x0a6, set: 0x253, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x33552e77b42f (tag: 0x277, set: 0x2d0, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x382b4c33166f (tag: 0x033, set: 0x059, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x33c332c1c16f (tag: 0x2c1, set: 0x305, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x372f8b79a9ef (tag: 0x379, set: 0x2a7, PC[5:0]: 0x02f)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9906 ( 99.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9927 ( 99.3%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9937 ( 99.4%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| evict_ibtb_with_evict_set #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Devict_ibtb_with_evict_set -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652542
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:   KERNEL |          Victim Domain:   KERNEL
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: IND_CALL |     Victim Branch Type: IND_CALL
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5d668902688c (tag: 0x102, set: 0x1a2, PC[5:0]: 0x00c)
+         victim: 0x60d3cd02688c (tag: 0x102, set: 0x1a2, PC[5:0]: 0x00c)
+
+        target0: 0x5d6689026a8c (offset: 0x200)
+   target1_mock: 0x60d3cd03788c (offset: 0x11000)
+  target1_short: 0x60d3cd026a8c (offset: 0x200)
+   target1_near: 0x60d389026a8c (offset: 0x43fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x209a0c1668a9 (tag: 0x016, set: 0x1a2, PC[5:0]: 0x029)
+  BTB Evict set: 0x20bdcb836884 (tag: 0x383, set: 0x1a2, PC[5:0]: 0x004)
+  BTB Evict set: 0x20b9669d6880 (tag: 0x29d, set: 0x1a2, PC[5:0]: 0x000)
+  BTB Evict set: 0x20340207688b (tag: 0x207, set: 0x1a2, PC[5:0]: 0x00b)
+  BTB Evict set: 0x20ded2ff6898 (tag: 0x2ff, set: 0x1a2, PC[5:0]: 0x018)
+  BTB Evict set: 0x20ef9fcc6890 (tag: 0x3cc, set: 0x1a2, PC[5:0]: 0x010)
+  BTB Evict set: 0x209eedcb68b1 (tag: 0x1cb, set: 0x1a2, PC[5:0]: 0x031)
+  BTB Evict set: 0x2040c8636889 (tag: 0x063, set: 0x1a2, PC[5:0]: 0x009)
+ iBTB Evict set: 0x313e11ed154c (tag: 0x1ed, set: 0x055, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x31eaa700f40c (tag: 0x300, set: 0x3d0, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3e13668cad0c (tag: 0x28c, set: 0x2b4, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3facd791d44c (tag: 0x391, set: 0x351, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3410f6239f0c (tag: 0x223, set: 0x27c, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x30544dc1948c (tag: 0x1c1, set: 0x252, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x3700daba060c (tag: 0x2ba, set: 0x018, PC[5:0]: 0x00c)
+ iBTB Evict set: 0x34d795ccfa0c (tag: 0x1cc, set: 0x3e8, PC[5:0]: 0x00c)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9581 ( 95.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9685 ( 96.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9684 ( 96.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      2 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_hit_ibtb_incorrect #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_hit_ibtb_incorrect -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652544
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5283820b83b8 (tag: 0x20b, set: 0x20e, PC[5:0]: 0x038)
+         victim: 0x631f6e0b83b8 (tag: 0x20b, set: 0x20e, PC[5:0]: 0x038)
+
+        target0: 0x5283820b85b8 (offset: 0x200)
+   target1_mock: 0x631f6e0c93b8 (offset: 0x11000)
+  target1_short: 0x631f6e0b85b8 (offset: 0x200)
+   target1_near: 0x631f820b85b8 (offset: 0x14000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1eb5620b83b8 (tag: 0x20b, set: 0x20e, PC[5:0]: 0x038)
+ iBTB Evict set: 0x31fc51eb6c78 (tag: 0x1eb, set: 0x1b1, PC[5:0]: 0x038)
+ iBTB Evict set: 0x361e13b74bf8 (tag: 0x3b7, set: 0x12f, PC[5:0]: 0x038)
+ iBTB Evict set: 0x3e972c6382b8 (tag: 0x063, set: 0x20a, PC[5:0]: 0x038)
+ iBTB Evict set: 0x38550e6e09f8 (tag: 0x26e, set: 0x027, PC[5:0]: 0x038)
+ iBTB Evict set: 0x3d881df4d6b8 (tag: 0x1f4, set: 0x35a, PC[5:0]: 0x038)
+ iBTB Evict set: 0x3d3e3b052ef8 (tag: 0x305, set: 0x0bb, PC[5:0]: 0x038)
+ iBTB Evict set: 0x3351f99a48b8 (tag: 0x19a, set: 0x122, PC[5:0]: 0x038)
+ iBTB Evict set: 0x32b5bea14cf8 (tag: 0x2a1, set: 0x133, PC[5:0]: 0x038)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     31 (  0.3%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_hit_ibtb_incorrect #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_hit_ibtb_incorrect -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652545
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5395a2c4e254 (tag: 0x2c4, set: 0x389, PC[5:0]: 0x014)
+         victim: 0x6eefd2c4e254 (tag: 0x2c4, set: 0x389, PC[5:0]: 0x014)
+
+        target0: 0x5395a2c4e454 (offset: 0x200)
+   target1_mock: 0x6eefd2c5f254 (offset: 0x11000)
+  target1_short: 0x6eefd2c4e454 (offset: 0x200)
+   target1_near: 0x6eefa2c4e454 (offset: 0x2ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1be5fac4e254 (tag: 0x2c4, set: 0x389, PC[5:0]: 0x014)
+ iBTB Evict set: 0x3f52126a3bd4 (tag: 0x26a, set: 0x0ef, PC[5:0]: 0x014)
+ iBTB Evict set: 0x3a11db88da14 (tag: 0x388, set: 0x368, PC[5:0]: 0x014)
+ iBTB Evict set: 0x367151a5f314 (tag: 0x1a5, set: 0x3cc, PC[5:0]: 0x014)
+ iBTB Evict set: 0x316f1e5a7314 (tag: 0x25a, set: 0x1cc, PC[5:0]: 0x014)
+ iBTB Evict set: 0x343b55e8c414 (tag: 0x1e8, set: 0x310, PC[5:0]: 0x014)
+ iBTB Evict set: 0x33f299989a54 (tag: 0x198, set: 0x269, PC[5:0]: 0x014)
+ iBTB Evict set: 0x37aa2b427494 (tag: 0x342, set: 0x1d2, PC[5:0]: 0x014)
+ iBTB Evict set: 0x3184326d3a14 (tag: 0x26d, set: 0x0e8, PC[5:0]: 0x014)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_hit_ibtb_miss #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_hit_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652547
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5129bcba4156 (tag: 0x0ba, set: 0x105, PC[5:0]: 0x016)
+         victim: 0x6109ecba4156 (tag: 0x0ba, set: 0x105, PC[5:0]: 0x016)
+
+        target0: 0x5129bcba4356 (offset: 0x200)
+   target1_mock: 0x6109ecbb5156 (offset: 0x11000)
+  target1_short: 0x6109ecba4356 (offset: 0x200)
+   target1_near: 0x6109bcba4356 (offset: 0x2ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1e01c4ba4156 (tag: 0x0ba, set: 0x105, PC[5:0]: 0x016)
+ iBTB Evict set: 0x389126256316 (tag: 0x225, set: 0x18c, PC[5:0]: 0x016)
+ iBTB Evict set: 0x37cf18325956 (tag: 0x032, set: 0x165, PC[5:0]: 0x016)
+ iBTB Evict set: 0x310a1f9353d6 (tag: 0x393, set: 0x14f, PC[5:0]: 0x016)
+ iBTB Evict set: 0x3f82e1192356 (tag: 0x119, set: 0x08d, PC[5:0]: 0x016)
+ iBTB Evict set: 0x327bc84d3296 (tag: 0x04d, set: 0x0ca, PC[5:0]: 0x016)
+ iBTB Evict set: 0x352fd1163696 (tag: 0x116, set: 0x0da, PC[5:0]: 0x016)
+ iBTB Evict set: 0x37d58697ed16 (tag: 0x297, set: 0x3b4, PC[5:0]: 0x016)
+ iBTB Evict set: 0x3b8c48eae696 (tag: 0x0ea, set: 0x39a, PC[5:0]: 0x016)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_hit_ibtb_miss #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_hit_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652548
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x57b36bee1029 (tag: 0x3ee, set: 0x040, PC[5:0]: 0x029)
+         victim: 0x699947ee1029 (tag: 0x3ee, set: 0x040, PC[5:0]: 0x029)
+
+        target0: 0x57b36bee1229 (offset: 0x200)
+   target1_mock: 0x699947ef2029 (offset: 0x11000)
+  target1_short: 0x699947ee1229 (offset: 0x200)
+   target1_near: 0x69996bee1229 (offset: 0x24000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1b7a1bee1029 (tag: 0x3ee, set: 0x040, PC[5:0]: 0x029)
+ iBTB Evict set: 0x370f8459eae9 (tag: 0x059, set: 0x3ab, PC[5:0]: 0x029)
+ iBTB Evict set: 0x35f2184c85e9 (tag: 0x04c, set: 0x217, PC[5:0]: 0x029)
+ iBTB Evict set: 0x3ba7e39d0c69 (tag: 0x39d, set: 0x031, PC[5:0]: 0x029)
+ iBTB Evict set: 0x3a6cde0f37a9 (tag: 0x20f, set: 0x0de, PC[5:0]: 0x029)
+ iBTB Evict set: 0x39db18d7f4a9 (tag: 0x0d7, set: 0x3d2, PC[5:0]: 0x029)
+ iBTB Evict set: 0x39ceb6859969 (tag: 0x285, set: 0x265, PC[5:0]: 0x029)
+ iBTB Evict set: 0x3c40df9f93e9 (tag: 0x39f, set: 0x24f, PC[5:0]: 0x029)
+ iBTB Evict set: 0x328d4f066ba9 (tag: 0x306, set: 0x1ae, PC[5:0]: 0x029)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_hit #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652549
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x53eb3b80a8aa (tag: 0x380, set: 0x2a2, PC[5:0]: 0x02a)
+         victim: 0x64b88780a8aa (tag: 0x380, set: 0x2a2, PC[5:0]: 0x02a)
+
+        target0: 0x53eb3b80aaaa (offset: 0x200)
+   target1_mock: 0x64b88781b8aa (offset: 0x11000)
+  target1_short: 0x64b88780aaaa (offset: 0x200)
+   target1_near: 0x64b83b80aaaa (offset: 0x4bfffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1b337b80a8aa (tag: 0x380, set: 0x2a2, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x332574ee4aaa (tag: 0x0ee, set: 0x12a, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3371eda2ca2a (tag: 0x1a2, set: 0x328, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x32f397736caa (tag: 0x373, set: 0x1b2, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x31cb7e6825ea (tag: 0x268, set: 0x097, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3f28699ccb2a (tag: 0x19c, set: 0x32c, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3ca4a1e237aa (tag: 0x1e2, set: 0x0de, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3d6fb5a85c2a (tag: 0x1a8, set: 0x170, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3849dd7ed32a (tag: 0x17e, set: 0x34c, PC[5:0]: 0x02a)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9995 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_hit #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652552
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5a307f5d5436 (tag: 0x35d, set: 0x150, PC[5:0]: 0x036)
+         victim: 0x62e1ff5d5436 (tag: 0x35d, set: 0x150, PC[5:0]: 0x036)
+
+        target0: 0x5a307f5d5636 (offset: 0x200)
+   target1_mock: 0x62e1ff5e6436 (offset: 0x11000)
+  target1_short: 0x62e1ff5d5636 (offset: 0x200)
+   target1_near: 0x62e17f5d5636 (offset: 0x7ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x16b8035d5436 (tag: 0x35d, set: 0x150, PC[5:0]: 0x036)
+ iBTB Evict set: 0x393fbbf356f6 (tag: 0x3f3, set: 0x15b, PC[5:0]: 0x036)
+ iBTB Evict set: 0x395b0ca47ab6 (tag: 0x0a4, set: 0x1ea, PC[5:0]: 0x036)
+ iBTB Evict set: 0x300e9cca2a76 (tag: 0x0ca, set: 0x0a9, PC[5:0]: 0x036)
+ iBTB Evict set: 0x3261f0b0b5b6 (tag: 0x0b0, set: 0x2d6, PC[5:0]: 0x036)
+ iBTB Evict set: 0x311e6eedc636 (tag: 0x2ed, set: 0x318, PC[5:0]: 0x036)
+ iBTB Evict set: 0x3be02c9fdcf6 (tag: 0x09f, set: 0x373, PC[5:0]: 0x036)
+ iBTB Evict set: 0x3049ff947a36 (tag: 0x394, set: 0x1e8, PC[5:0]: 0x036)
+ iBTB Evict set: 0x3c1193f578f6 (tag: 0x3f5, set: 0x1e3, PC[5:0]: 0x036)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9954 ( 99.5%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9948 ( 99.5%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9943 ( 99.4%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9957 ( 99.6%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9948 ( 99.5%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_incorrect_test_btb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_incorrect_test_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652554
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5e0a21bec197 (tag: 0x1be, set: 0x306, PC[5:0]: 0x017)
+         victim: 0x67f0fdbec197 (tag: 0x1be, set: 0x306, PC[5:0]: 0x017)
+
+        target0: 0x5e0a21bec397 (offset: 0x200)
+   target1_mock: 0x67f0fdbfd197 (offset: 0x11000)
+  target1_short: 0x67f0fdbec397 (offset: 0x200)
+   target1_near: 0x67f021bec397 (offset: 0xdbfffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x101469bec197 (tag: 0x1be, set: 0x306, PC[5:0]: 0x017)
+ iBTB Evict set: 0x343af32f9a97 (tag: 0x32f, set: 0x26a, PC[5:0]: 0x017)
+ iBTB Evict set: 0x3b38408d5d17 (tag: 0x08d, set: 0x174, PC[5:0]: 0x017)
+ iBTB Evict set: 0x3e0836210297 (tag: 0x221, set: 0x00a, PC[5:0]: 0x017)
+ iBTB Evict set: 0x37fa6c876cd7 (tag: 0x087, set: 0x1b3, PC[5:0]: 0x017)
+ iBTB Evict set: 0x3a6f63050557 (tag: 0x305, set: 0x015, PC[5:0]: 0x017)
+ iBTB Evict set: 0x3705b44d8617 (tag: 0x04d, set: 0x218, PC[5:0]: 0x017)
+ iBTB Evict set: 0x3fe59608c057 (tag: 0x208, set: 0x301, PC[5:0]: 0x017)
+ iBTB Evict set: 0x39cfb21c83d7 (tag: 0x21c, set: 0x20f, PC[5:0]: 0x017)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      6 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     17 (  0.2%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     13 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      5 (  0.1%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_incorrect_test_btb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_incorrect_test_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652556
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x59ecd941b8ba (tag: 0x141, set: 0x2e2, PC[5:0]: 0x03a)
+         victim: 0x6a4bd541b8ba (tag: 0x141, set: 0x2e2, PC[5:0]: 0x03a)
+
+        target0: 0x59ecd941baba (offset: 0x200)
+   target1_mock: 0x6a4bd542c8ba (offset: 0x11000)
+  target1_short: 0x6a4bd541baba (offset: 0x200)
+   target1_near: 0x6a4bd941baba (offset: 0x4000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1a4cd541b8ba (tag: 0x141, set: 0x2e2, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x3ee9f2092d3a (tag: 0x209, set: 0x0b4, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x3ab46fd172fa (tag: 0x3d1, set: 0x1cb, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x34c46293cb3a (tag: 0x293, set: 0x32c, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x3b83a424e43a (tag: 0x024, set: 0x390, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x31b842812b7a (tag: 0x281, set: 0x0ad, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x3670b219a0fa (tag: 0x219, set: 0x283, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x3eb99287893a (tag: 0x287, set: 0x224, PC[5:0]: 0x03a)
+ iBTB Evict set: 0x322e26613bba (tag: 0x261, set: 0x0ee, PC[5:0]: 0x03a)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    101 (  1.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    205 (  2.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9995 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    131 (  1.3%)      0 (  0.0%)  (/10000)
+Total iterations: 2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_incorrect_test_ibtb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_incorrect_test_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652558
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5ee2a7e00759 (tag: 0x3e0, set: 0x01d, PC[5:0]: 0x019)
+         victim: 0x655f97e00759 (tag: 0x3e0, set: 0x01d, PC[5:0]: 0x019)
+
+        target0: 0x5ee2a7e00959 (offset: 0x200)
+   target1_mock: 0x655f97e11759 (offset: 0x11000)
+  target1_short: 0x655f97e00959 (offset: 0x200)
+   target1_near: 0x655fa7e00959 (offset: 0x10000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1a10cfe00759 (tag: 0x3e0, set: 0x01d, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3fb0316af059 (tag: 0x16a, set: 0x3c1, PC[5:0]: 0x019)
+ iBTB Evict set: 0x36490cbd4099 (tag: 0x0bd, set: 0x102, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3d85edb83119 (tag: 0x1b8, set: 0x0c4, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3727c6001819 (tag: 0x200, set: 0x060, PC[5:0]: 0x019)
+ iBTB Evict set: 0x39d8c3127059 (tag: 0x312, set: 0x1c1, PC[5:0]: 0x019)
+ iBTB Evict set: 0x327768ab00d9 (tag: 0x0ab, set: 0x003, PC[5:0]: 0x019)
+ iBTB Evict set: 0x31b842a43599 (tag: 0x2a4, set: 0x0d6, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3c3260690559 (tag: 0x069, set: 0x015, PC[5:0]: 0x019)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)      4 ( 40.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      6 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 10
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_incorrect_ibtb_incorrect_test_ibtb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_incorrect_ibtb_incorrect_test_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652559
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x58d4f5748d6b (tag: 0x174, set: 0x235, PC[5:0]: 0x02b)
+         victim: 0x6890f1748d6b (tag: 0x174, set: 0x235, PC[5:0]: 0x02b)
+
+        target0: 0x58d4f5748f6b (offset: 0x200)
+   target1_mock: 0x6890f1759d6b (offset: 0x11000)
+  target1_short: 0x6890f1748f6b (offset: 0x200)
+   target1_near: 0x6890f5748f6b (offset: 0x4000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1700b9748d6b (tag: 0x174, set: 0x235, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x3a2ea0868deb (tag: 0x086, set: 0x237, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x3554e7d6e32b (tag: 0x3d6, set: 0x38c, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x39a6702b38ab (tag: 0x02b, set: 0x0e2, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x318ad988cd6b (tag: 0x188, set: 0x335, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x376b17cc042b (tag: 0x3cc, set: 0x010, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x3d06a9be07eb (tag: 0x1be, set: 0x01f, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x34bf6b23936b (tag: 0x323, set: 0x24d, PC[5:0]: 0x02b)
+ iBTB Evict set: 0x3d9b3ccd7e2b (tag: 0x0cd, set: 0x1f8, PC[5:0]: 0x02b)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)      9 ( 90.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)    160 (  1.6%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    166 (  1.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     11 (  0.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)    491 (  4.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)     34 (  0.3%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_mis_ibtb_hit #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_mis_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652560
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5b633cbf620e (tag: 0x0bf, set: 0x188, PC[5:0]: 0x00e)
+         victim: 0x664bbcbf620e (tag: 0x0bf, set: 0x188, PC[5:0]: 0x00e)
+
+        target0: 0x5b633cbf640e (offset: 0x200)
+   target1_mock: 0x664bbcc0720e (offset: 0x11000)
+  target1_short: 0x664bbcbf640e (offset: 0x200)
+   target1_near: 0x664b3cbf640e (offset: 0x7ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1f2a80bf620e (tag: 0x0bf, set: 0x188, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3b88a0b92e8e (tag: 0x0b9, set: 0x0ba, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x34e1559cfc8e (tag: 0x19c, set: 0x3f2, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x365d78a09f4e (tag: 0x0a0, set: 0x27d, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3ef79f18638e (tag: 0x318, set: 0x18e, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3a0d24ac718e (tag: 0x0ac, set: 0x1c6, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3a0c77cee30e (tag: 0x3ce, set: 0x38c, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3a31c38d65ce (tag: 0x38d, set: 0x197, PC[5:0]: 0x00e)
+ iBTB Evict set: 0x3291fa535f4e (tag: 0x253, set: 0x17d, PC[5:0]: 0x00e)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_mis_ibtb_hit #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_mis_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652562
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5e2e2b23d5ef (tag: 0x323, set: 0x357, PC[5:0]: 0x02f)
+         victim: 0x65e0bb23d5ef (tag: 0x323, set: 0x357, PC[5:0]: 0x02f)
+
+        target0: 0x5e2e2b23d7ef (offset: 0x200)
+   target1_mock: 0x65e0bb24e5ef (offset: 0x11000)
+  target1_short: 0x65e0bb23d7ef (offset: 0x200)
+   target1_near: 0x65e02b23d7ef (offset: 0x8ffffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x14b85323d5ef (tag: 0x323, set: 0x357, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3a70c45e38ef (tag: 0x05e, set: 0x0e3, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3b1e93dcc7ef (tag: 0x3dc, set: 0x31f, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x37a8f56748ef (tag: 0x167, set: 0x123, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3ee657b8602f (tag: 0x3b8, set: 0x180, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3b1e5bea1d2f (tag: 0x3ea, set: 0x074, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x35300e17752f (tag: 0x217, set: 0x1d4, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x394e404522ef (tag: 0x045, set: 0x08b, PC[5:0]: 0x02f)
+ iBTB Evict set: 0x3dae5ca1796f (tag: 0x0a1, set: 0x1e5, PC[5:0]: 0x02f)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_miss_ibtb_miss_test_btb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_miss_ibtb_miss_test_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652564
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5b55cd250266 (tag: 0x125, set: 0x009, PC[5:0]: 0x026)
+         victim: 0x6641f1250266 (tag: 0x125, set: 0x009, PC[5:0]: 0x026)
+
+        target0: 0x5b55cd250466 (offset: 0x200)
+   target1_mock: 0x6641f1261266 (offset: 0x11000)
+  target1_short: 0x6641f1250466 (offset: 0x200)
+   target1_near: 0x6641cd250466 (offset: 0x23fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x173de1250266 (tag: 0x125, set: 0x009, PC[5:0]: 0x026)
+ iBTB Evict set: 0x313a2a99aba6 (tag: 0x299, set: 0x2ae, PC[5:0]: 0x026)
+ iBTB Evict set: 0x37b685a81ea6 (tag: 0x1a8, set: 0x07a, PC[5:0]: 0x026)
+ iBTB Evict set: 0x364eda803326 (tag: 0x280, set: 0x0cc, PC[5:0]: 0x026)
+ iBTB Evict set: 0x359285443266 (tag: 0x144, set: 0x0c9, PC[5:0]: 0x026)
+ iBTB Evict set: 0x32ce4cea3226 (tag: 0x0ea, set: 0x0c8, PC[5:0]: 0x026)
+ iBTB Evict set: 0x3195dc2c81a6 (tag: 0x02c, set: 0x206, PC[5:0]: 0x026)
+ iBTB Evict set: 0x3a1f660859a6 (tag: 0x208, set: 0x166, PC[5:0]: 0x026)
+ iBTB Evict set: 0x39f95cb473e6 (tag: 0x0b4, set: 0x1cf, PC[5:0]: 0x026)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9993 ( 99.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9994 ( 99.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_miss_ibtb_miss_test_btb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_miss_ibtb_miss_test_btb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652566
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x54cc92d2877c (tag: 0x2d2, set: 0x21d, PC[5:0]: 0x03c)
+         victim: 0x6a9742d2877c (tag: 0x2d2, set: 0x21d, PC[5:0]: 0x03c)
+
+        target0: 0x54cc92d2897c (offset: 0x200)
+   target1_mock: 0x6a9742d3977c (offset: 0x11000)
+  target1_short: 0x6a9742d2897c (offset: 0x200)
+   target1_near: 0x6a9792d2897c (offset: 0x50000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1df07ed2877c (tag: 0x2d2, set: 0x21d, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x3b148957fbfc (tag: 0x157, set: 0x3ef, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x375cd3989a3c (tag: 0x398, set: 0x268, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x3244a4b753fc (tag: 0x0b7, set: 0x14f, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x37ba1749037c (tag: 0x349, set: 0x00d, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x3b0fb49b90bc (tag: 0x09b, set: 0x242, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x3edcd35bb23c (tag: 0x35b, set: 0x2c8, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x33c025c0c0fc (tag: 0x1c0, set: 0x303, PC[5:0]: 0x03c)
+ iBTB Evict set: 0x38886f59e6bc (tag: 0x359, set: 0x39a, PC[5:0]: 0x03c)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_miss_ibtb_miss_test_ibtb #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_miss_ibtb_miss_test_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652568
+=========================== MAIN CONFIGURATION ===========================
+   test_btb_identify_set_bits_prefetch ER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================test_btb_identify_set_bits_prefetch
+
+       training: 0x5f8b22042227 (tag: 0x204, set: 0x088, PC[5:0]: 0x027)
+         victim: 0x6ab112042227 (tag: 0x204, set: 0x088, PC[5:0]: 0x027)
+
+        target0: 0x5f8b22042427 (offset: 0x200)
+   target1_mock: 0x6ab112053227 (offset: 0x11000)
+  target1_short: 0x6ab112042427 (offset: 0x200)
+   target1_near: 0x6ab122042427 (offset: 0x10000200)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x135afa042227 (tag: 0x204, set: 0x088, PC[5:0]: 0x027)
+ iBTB Evict set: 0x35b117eea7e7 (tag: 0x3ee, set: 0x29f, PC[5:0]: 0x027)
+ iBTB Evict set: 0x34baae67e227 (tag: 0x267, set: 0x388, PC[5:0]: 0x027)
+ iBTB Evict set: 0x35aca6c64027 (tag: 0x2c6, set: 0x100, PC[5:0]: 0x027)
+ iBTB Evict set: 0x30ad3886eca7 (tag: 0x086, set: 0x3b2, PC[5:0]: 0x027)
+ iBTB Evict set: 0x302ef25fb967 (tag: 0x25f, set: 0x2e5, PC[5:0]: 0x027)
+ iBTB Evict set: 0x30c4437bc4e7 (tag: 0x37b, set: 0x313, PC[5:0]: 0x027)
+ iBTB Evict set: 0x3267b8ce8e67 (tag: 0x0ce, set: 0x239, PC[5:0]: 0x027)
+ iBTB Evict set: 0x3ae4f7e4d267 (tag: 0x3e4, set: 0x349, PC[5:0]: 0x027)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9997 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| ind_ind_btb_miss_ibtb_miss_test_ibtb #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dind_ind_btb_miss_ibtb_miss_test_ibtb -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652569
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5687b5a3566c (tag: 0x1a3, set: 0x159, PC[5:0]: 0x02c)
+   test_btb_identify_set_bits_prefetch c (tag: 0x1a3, set: 0x159, PC[5:0]: 0x02c)
+
+        target0: 0x5687b5a3586c (offset: 0x200)
+   target1_mock: 0x6e33c9a4666c (offset: 0x11000)
+  target1_short: 0x6e33c9a3586c (offset: 0x200)test_btb_identify_set_bits_prefetch
+   target1_near: 0x6e33b5a3586c (offset: 0x13fffe00)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1ed865a3566c (tag: 0x1a3, set: 0x159, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x309cf54f56ac (tag: 0x14f, set: 0x15a, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x345ac322f8ec (tag: 0x322, set: 0x3e3, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x317d385c092c (tag: 0x05c, set: 0x024, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3463c59564ac (tag: 0x195, set: 0x192, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x377e307afeec (tag: 0x07a, set: 0x3fb, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3ff54309982c (tag: 0x309, set: 0x260, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x329df4f4ceec (tag: 0x0f4, set: 0x33b, PC[5:0]: 0x02c)
+ iBTB Evict set: 0x3bb0a203ba2c (tag: 0x203, set: 0x2e8, PC[5:0]: 0x02c)
+
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9968 ( 99.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9981 ( 99.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9973 ( 99.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9971 ( 99.7%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9969 ( 99.7%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_identify_set_bits #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_identify_set_bits -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652570
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type: DIR_UNCO
+ Prefetch side-channel:        1 |
+==========================================================================
+
+       training: 0x57cca3cfb612 (tag: 0x3cf, set: 0x2d8, PC[5:0]: 0x012)
+         victim: 0x67cca3cfb612 (tag: 0x3cf, set: 0x2d8, PC[5:0]: 0x012)
+
+        target0: 0x57cca3d0b532 (offset: 0xff20)
+   target1_mock: 0x67cca3d0c612 (offset: 0x11000)
+  target1_short: 0x67cca3cfb532 (offset: 0xe0)
+   target1_near: 0x67cca3d0b532 (offset: 0xff20)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x20c54b68b616 (tag: 0x368, set: 0x2d8, PC[5:0]: 0x016)
+  BTB Evict set: 0x2016f558b60b (tag: 0x158, set: 0x2d8, PC[5:0]: 0x00b)
+  BTB Evict set: 0x20b9fde6b602 (tag: 0x1e6, set: 0x2d8, PC[5:0]: 0x002)
+  BTB Evict set: 0x206d8a4ab630 (tag: 0x24a, set: 0x2d8, PC[5:0]: 0x030)
+  BTB Evict set: 0x20121abfb61f (tag: 0x2bf, set: 0x2d8, PC[5:0]: 0x01f)
+  BTB Evict set: 0x20e21de9b612 (tag: 0x1e9, set: 0x2d8, PC[5:0]: 0x012)
+  BTB Evict set: 0x20c7753fb610 (tag: 0x13f, set: 0x2d8, PC[5:0]: 0x010)
+  BTB Evict set: 0x20c9fd43b61f (tag: 0x143, set: 0x2d8, PC[5:0]: 0x01f)
+
+Initial test:
+No signal, this is good! We have a correct eviction
+
+[+] We have setup an BTB eviction set which we walk after execution of
+    the training branch. Without flipping any training/victim bits,
+    the eviction set should evict the inserted entry with no signal as result.
+    In this test we flip training and victim branch bits to check which flips
+    result in indexing in a different set, making the eviction set ineffective
+    with as result a signal.
+ -- Both: For this test the 'BOTH' results matter: where we flip the bit
+    for both the training branch and the victim branch.
+    The bits we can flip are the bits that are used for set indexing.
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: { 6,  7,  8,  9, }
+   VICTIM: {}
+     BOTH: { 6,  7,  8,  9, 10, 11, 12, 13, 14, 15, }
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_identify_set_bits #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_identify_set_bits -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652576
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type: DIR_UNCO
+ Prefetch side-channel:        1 |
+==========================================================================
+
+       training: 0x566ab7483753 (tag: 0x348, set: 0x0dd, PC[5:0]: 0x013)
+         victim: 0x666ab7483753 (tag: 0x348, set: 0x0dd, PC[5:0]: 0x013)
+
+        target0: 0x566ab7493673 (offset: 0xff20)
+   target1_mock: 0x666ab7494753 (offset: 0x11000)
+  target1_short: 0x666ab7483673 (offset: 0xe0)
+   target1_near: 0x666ab7493673 (offset: 0xff20)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x20539b163772 (tag: 0x316, set: 0x0dd, PC[5:0]: 0x032)
+  BTB Evict set: 0x20b31b98376e (tag: 0x398, set: 0x0dd, PC[5:0]: 0x02e)
+  BTB Evict set: 0x202eee71376b (tag: 0x271, set: 0x0dd, PC[5:0]: 0x02b)
+  BTB Evict set: 0x20a785143764 (tag: 0x114, set: 0x0dd, PC[5:0]: 0x024)
+  BTB Evict set: 0x20d75ef73748 (tag: 0x2f7, set: 0x0dd, PC[5:0]: 0x008)
+  BTB Evict set: 0x20c82c2f377c (tag: 0x02f, set: 0x0dd, PC[5:0]: 0x03c)
+  BTB Evict set: 0x20da1862376b (tag: 0x062, set: 0x0dd, PC[5:0]: 0x02b)
+  BTB Evict set: 0x208a7c7a3740 (tag: 0x07a, set: 0x0dd, PC[5:0]: 0x000)
+
+Initial test:
+No signal, this is good! We have a correct eviction
+
+[+] We have setup an BTB eviction set which we walk after execution of
+    the training branch. Without flipping any training/victim bits,
+    the eviction set should evict the inserted entry with no signal as result.
+    In this test we flip training and victim branch bits to check which flips
+    result in indexing in a different set, making the eviction set ineffective
+    with as result a signal.
+ -- Both: For this test the 'BOTH' results matter: where we flip the bit
+    for both the training branch and the victim branch.
+    The bits we can flip are the bits that are used for set indexing.
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: { 6,  7,  8,  9, }
+   VICTIM: {}
+     BOTH: { 6,  7,  8,  9, 10, 11, 12, 13, 14, 15, }
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_identify_set_bits #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_identify_set_bits -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652582
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5aa2d6120e1e (tag: 0x212, set: 0x038, PC[5:0]: 0x01e)
+         victim: 0x6aa2d6120e1e (tag: 0x212, set: 0x038, PC[5:0]: 0x01e)
+
+        target0: 0x5aa2d6130d7e (offset: 0xff60)
+   target1_mock: 0x6aa2d6131e1e (offset: 0x11000)
+  target1_short: 0x6aa2d6120d7e (offset: 0xa0)
+   target1_near: 0x6aa2d6130d7e (offset: 0xff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x2089a3210e23 (tag: 0x321, set: 0x038, PC[5:0]: 0x023)
+  BTB Evict set: 0x20cc511c0e00 (tag: 0x11c, set: 0x038, PC[5:0]: 0x000)
+  BTB Evict set: 0x2095db2b0e25 (tag: 0x32b, set: 0x038, PC[5:0]: 0x025)
+  BTB Evict set: 0x200ec9c90e2f (tag: 0x1c9, set: 0x038, PC[5:0]: 0x02f)
+  BTB Evict set: 0x20e0f5df0e04 (tag: 0x1df, set: 0x038, PC[5:0]: 0x004)
+  BTB Evict set: 0x20eb47170e0c (tag: 0x317, set: 0x038, PC[5:0]: 0x00c)
+  BTB Evict set: 0x20bd4ea40e0c (tag: 0x2a4, set: 0x038, PC[5:0]: 0x00c)
+  BTB Evict set: 0x203987b70e2a (tag: 0x3b7, set: 0x038, PC[5:0]: 0x02a)
+ iBTB Evict set: 0x3efd984a999e (tag: 0x04a, set: 0x266, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x316fe32211de (tag: 0x322, set: 0x047, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x389bf4992d9e (tag: 0x099, set: 0x0b6, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x3613924db3de (tag: 0x24d, set: 0x2cf, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x3e94b70f859e (tag: 0x30f, set: 0x216, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x305a6d62c69e (tag: 0x162, set: 0x31a, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x391d4d47741e (tag: 0x147, set: 0x1d0, PC[5:0]: 0x01e)
+ iBTB Evict set: 0x3cc655ba209e (tag: 0x1ba, set: 0x082, PC[5:0]: 0x01e)
+
+Initial test:
+No signal, this is good! We have a correct eviction
+
+[+] We have setup an BTB eviction set which we walk after execution of
+    the training branch. Without flipping any training/victim bits,
+    the eviction set should evict the inserted entry with no signal as result.
+    In this test we flip training and victim branch bits to check which flips
+    result in indexing in a different set, making the eviction set ineffective
+    with as result a signal.
+ -- Both: For this test the 'BOTH' results matter: where we flip the bit
+    for both the training branch and the victim branch.
+    The bits we can flip are the bits that are used for set indexing.
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: {}
+   VICTIM: {}
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_identify_set_bits #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_identify_set_bits -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652595
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5fd4ceb72f9c (tag: 0x2b7, set: 0x0be, PC[5:0]: 0x01c)
+         victim: 0x6fd4ceb72f9c (tag: 0x2b7, set: 0x0be, PC[5:0]: 0x01c)
+
+        target0: 0x5fd4ceb82efc (offset: 0xff60)
+   target1_mock: 0x6fd4ceb83f9c (offset: 0x11000)
+  target1_short: 0x6fd4ceb72efc (offset: 0xa0)
+   target1_near: 0x6fd4ceb82efc (offset: 0xff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x203931d02fa4 (tag: 0x1d0, set: 0x0be, PC[5:0]: 0x024)
+  BTB Evict set: 0x203e0ec62f95 (tag: 0x2c6, set: 0x0be, PC[5:0]: 0x015)
+  BTB Evict set: 0x20fbf97d2f80 (tag: 0x17d, set: 0x0be, PC[5:0]: 0x000)
+  BTB Evict set: 0x20fee4d12fb2 (tag: 0x0d1, set: 0x0be, PC[5:0]: 0x032)
+  BTB Evict set: 0x20a8f95f2f8d (tag: 0x15f, set: 0x0be, PC[5:0]: 0x00d)
+  BTB Evict set: 0x207e753f2f8f (tag: 0x13f, set: 0x0be, PC[5:0]: 0x00f)
+  BTB Evict set: 0x202398cb2f92 (tag: 0x0cb, set: 0x0be, PC[5:0]: 0x012)
+  BTB Evict set: 0x20f81b8a2f83 (tag: 0x38a, set: 0x0be, PC[5:0]: 0x003)
+ iBTB Evict set: 0x38aa30e65cdc (tag: 0x0e6, set: 0x173, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x31deb9a126dc (tag: 0x1a1, set: 0x09b, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x3e4b280bd61c (tag: 0x00b, set: 0x358, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x3ca2c5ec44dc (tag: 0x1ec, set: 0x113, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x32567b9a7bdc (tag: 0x39a, set: 0x1ef, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x3fa60a2fde5c (tag: 0x22f, set: 0x379, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x3c39d4d79e9c (tag: 0x0d7, set: 0x27a, PC[5:0]: 0x01c)
+ iBTB Evict set: 0x326ca6e2a39c (tag: 0x2e2, set: 0x28e, PC[5:0]: 0x01c)
+
+Initial test:
+No signal, this is good! We have a correct eviction
+
+[+] We have setup an BTB eviction set which we walk after execution of
+    the training branch. Without flipping any training/victim bits,
+    the eviction set should evict the inserted entry with no signal as result.
+    In this test we flip training and victim branch bits to check which flips
+    result in indexing in a different set, making the eviction set ineffective
+    with as result a signal.
+ -- Both: For this test the 'BOTH' results matter: where we flip the bit
+    for both the training branch and the victim branch.
+    The bits we can flip are the bits that are used for set indexing.
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: {}
+   VICTIM: {}
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_tag_set #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_tag_set -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652609
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5d411738c691 (tag: 0x338, set: 0x31a, PC[5:0]: 0x011)
+         victim: 0x6d411738c691 (tag: 0x338, set: 0x31a, PC[5:0]: 0x011)
+
+        target0: 0x5d411739c5f1 (offset: 0xff60)
+   target1_mock: 0x6d411739d691 (offset: 0x11000)
+  target1_short: 0x6d411738c5f1 (offset: 0xa0)
+   target1_near: 0x6d411739c5f1 (offset: 0xff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x15126338c691 (tag: 0x338, set: 0x31a, PC[5:0]: 0x011)
+ iBTB Evict set: 0x32b6d8a60e51 (tag: 0x0a6, set: 0x039, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3dbf33db8c11 (tag: 0x3db, set: 0x230, PC[5:0]: 0x011)
+ iBTB Evict set: 0x31b6c16de7d1 (tag: 0x16d, set: 0x39f, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3903b89dec11 (tag: 0x09d, set: 0x3b0, PC[5:0]: 0x011)
+ iBTB Evict set: 0x3eefeceaf351 (tag: 0x0ea, set: 0x3cd, PC[5:0]: 0x011)
+ iBTB Evict set: 0x30569b06a091 (tag: 0x306, set: 0x282, PC[5:0]: 0x011)
+ iBTB Evict set: 0x31598cb29e51 (tag: 0x0b2, set: 0x279, PC[5:0]: 0x011)
+ iBTB Evict set: 0x30021adedb11 (tag: 0x2de, set: 0x36c, PC[5:0]: 0x011)
+
+Initial test:
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      1 (  0.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9995 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      2 (  0.0%)      0 (  0.0%)  (/10000)
+
+[+] This test shows which bits can be flipped without affecting the
+    aliasing between the training and victim branch
+ -- Single bits: If we can flip a single bit, than this bit is
+    likely not used for neither the tag or set
+ -- Two bits: If we can flip two bits at the same time, than those bit are
+    likely part of a XOR function in either the set or tag algorithm
+    Note: Flips that we can flip individually are filtered out
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+   VICTIM: {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+     BOTH: { 0,  2,  3, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+-- TESTING FLIPPING TWO BITS    [                    ]
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [....................
+ TRAINING: {}
+   VICTIM: {}
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_tag_set #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_tag_set -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652648
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type:  IND_JMP |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x52f22fa93238 (tag: 0x3a9, set: 0x0c8, PC[5:0]: 0x038)
+         victim: 0x62f22fa93238 (tag: 0x3a9, set: 0x0c8, PC[5:0]: 0x038)
+
+        target0: 0x52f22faa3198 (offset: 0xff60)
+   target1_mock: 0x62f22faa4238 (offset: 0x11000)
+  target1_short: 0x62f22fa93198 (offset: 0xa0)
+   target1_near: 0x62f22faa3198 (offset: 0xff60)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+  BTB Evict set: 0x1e774ba93238 (tag: 0x3a9, set: 0x0c8, PC[5:0]: 0x038)
+ iBTB Evict set: 0x3eb38baff478 (tag: 0x3af, set: 0x3d1, PC[5:0]: 0x038)
+ iBTB Evict set: 0x34c0e34e7a38 (tag: 0x34e, set: 0x1e8, PC[5:0]: 0x038)
+ iBTB Evict set: 0x39770d9ee838 (tag: 0x19e, set: 0x3a0, PC[5:0]: 0x038)
+ iBTB Evict set: 0x32fc1e267338 (tag: 0x226, set: 0x1cc, PC[5:0]: 0x038)
+ iBTB Evict set: 0x35794414e078 (tag: 0x014, set: 0x381, PC[5:0]: 0x038)
+ iBTB Evict set: 0x33b5fbce4838 (tag: 0x3ce, set: 0x120, PC[5:0]: 0x038)
+ iBTB Evict set: 0x35ae0fd63eb8 (tag: 0x3d6, set: 0x0fa, PC[5:0]: 0x038)
+ iBTB Evict set: 0x35a9d3d23f38 (tag: 0x3d2, set: 0x0fc, PC[5:0]: 0x038)
+
+Initial test:
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)   9998 (100.0%)      0 (  0.0%)  (/10000)
+
+[+] This test shows which bits can be flipped without affecting the
+    aliasing between the training and victim branch
+ -- Single bits: If we can flip a single bit, than this bit is
+    likely not used for neither the tag or set
+ -- Two bits: If we can flip two bits at the same time, than those bit are
+    likely part of a XOR function in either the set or tag algorithm
+    Note: Flips that we can flip individually are filtered out
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+   VICTIM: {26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+     BOTH: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+-- TESTING FLIPPING TWO BITS    [                    ]
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [....................
+ TRAINING: {}
+   VICTIM: {}
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_tag_set_prefetch #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_tag_set_prefetch -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652687
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type: DIR_UNCO
+ Prefetch side-channel:        1 |
+==========================================================================
+
+       training: 0x5590843637ad (tag: 0x036, set: 0x0de, PC[5:0]: 0x02d)
+         victim: 0x6590843637ad (tag: 0x036, set: 0x0de, PC[5:0]: 0x02d)
+
+        target0: 0x5590843736cd (offset: 0xff20)
+   target1_mock: 0x6590843747ad (offset: 0x11000)
+  target1_short: 0x6590843636cd (offset: 0xe0)
+   target1_near: 0x6590843736cd (offset: 0xff20)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+Initial test:
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)     10 (100.0%)  (/10)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8846 ( 88.5%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)   8852 ( 88.5%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8901 ( 89.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8909 ( 89.1%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8932 ( 89.3%)  (/10000)
+
+[+] This test shows which bits can be flipped without affecting the
+    aliasing between the training and victim branch
+ -- Single bits: If we can flip a single bit, than this bit is
+    likely not used for neither the tag or set
+ -- Two bits: If we can flip two bits at the same time, than those bit are
+    likely part of a XOR function in either the set or tag algorithm
+    Note: Flips that we can flip individually are filtered out
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+   VICTIM: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+     BOTH: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+-- TESTING FLIPPING TWO BITS    [                    ]
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [....................
+-- TESTING FLIPPING TWO BITS    [....................
+ TRAINING: {12_16, }
+   VICTIM: {12_16, }
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| test_btb_tag_set_prefetch #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Dtest_btb_tag_set_prefetch -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652705
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type: COND BRS |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type: DIR_UNCO
+ Prefetch side-channel:        1 |
+==========================================================================
+
+       training: 0x5b7ff089f254 (tag: 0x089, set: 0x3c9, PC[5:0]: 0x014)
+         victim: 0x6b7ff089f254 (tag: 0x089, set: 0x3c9, PC[5:0]: 0x014)
+
+        target0: 0x5b7ff08af174 (offset: 0xff20)
+   target1_mock: 0x6b7ff08b0254 (offset: 0x11000)
+  target1_short: 0x6b7ff089f174 (offset: 0xe0)
+   target1_near: 0x6b7ff08af174 (offset: 0xff20)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+
+
+Initial test:
+
+                     SHORT            NEAR             FAR
+           INITIAL:      0 (  0.0%)     10 (100.0%)      8 ( 80.0%)  (/10)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)   8904 ( 89.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8898 ( 89.0%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8864 ( 88.6%)  (/10000)
+            VERIFY:      0 (  0.0%)   9999 (100.0%)   8861 ( 88.6%)  (/10000)
+            VERIFY:      0 (  0.0%)  10000 (100.0%)   8822 ( 88.2%)  (/10000)
+
+[+] This test shows which bits can be flipped without affecting the
+    aliasing between the training and victim branch
+ -- Single bits: If we can flip a single bit, than this bit is
+    likely not used for neither the tag or set
+ -- Two bits: If we can flip two bits at the same time, than those bit are
+    likely part of a XOR function in either the set or tag algorithm
+    Note: Flips that we can flip individually are filtered out
+
+-- TESTING FLIPPING SINGLE BITS [                    ]
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [.
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [..
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [...
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [.....
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [.......
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [.........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [..........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [...........
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [.............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [..............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [...............
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [.................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [..................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [...................
+-- TESTING FLIPPING SINGLE BITS [....................
+-- TESTING FLIPPING SINGLE BITS [....................
+ TRAINING: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+   VICTIM: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+     BOTH: { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, }
+-- TESTING FLIPPING TWO BITS    [                    ]
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [.
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [..
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [...
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [.....
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [.......
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [.........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [..........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [...........
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [.............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [..............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [...............
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [.................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [..................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [...................
+-- TESTING FLIPPING TWO BITS    [....................
+-- TESTING FLIPPING TWO BITS    [....................
+ TRAINING: {12_16, }
+   VICTIM: {12_16, }
+     BOTH: {}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_hit_ibtb_hit #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_hit_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652722
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5c33b097ca65 (tag: 0x097, set: 0x329, PC[5:0]: 0x025)
+ extra_training: 0x46f09c97ca4a (tag: 0x097, set: 0x329, PC[5:0]: 0x00a)
+         victim: 0x690b8497ca4a (tag: 0x097, set: 0x329, PC[5:0]: 0x00a)
+
+        target0: 0x5c33b097cc35 (offset: 0x1d0)
+   target1_mock: 0x690b8498da4a (offset: 0x11000)
+  target1_short: 0x690b8497cc35 (offset: 0x1eb)
+   target1_near: 0x690bb097cc35 (offset: 0x2c0001eb)
+        target2: 0x46f09c97ccab (offset: 0x261)
+  target2_short: 0x690b8497ccab (offset: 0x261)
+   target2_near: 0x690b9c97ccab (offset: 0x18000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+
+
+                     SHORT            NEAR             FAR         | SHORT EXTRA      NEAR EXTRA       FAR EXTRA
+           INITIAL:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9413 ( 94.1%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9993 ( 99.9%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9815 ( 98.2%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   4356 ( 43.6%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_hit_ibtb_hit #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_hit_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652723
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x520fd9ad13f7 (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x037)
+ extra_training: 0x4d4ed9ad13df (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x01f)
+         victim: 0x6f4dc9ad13df (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x01f)
+
+        target0: 0x520fd9ad15c7 (offset: 0x1d0)
+   target1_mock: 0x6f4dc9ae23df (offset: 0x11000)
+  target1_short: 0x6f4dc9ad15c7 (offset: 0x1e8)
+   target1_near: 0x6f4dd9ad15c7 (offset: 0x100001e8)
+        target2: 0x4d4ed9ad1640 (offset: 0x261)
+  target2_short: 0x6f4dc9ad1640 (offset: 0x261)
+   target2_near: 0x6f4dd9ad1640 (offset: 0x10000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+
+
+                     SHORT            NEAR             FAR         | SHORT EXTRA      NEAR EXTRA       FAR EXTRA
+           INITIAL:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9931 ( 99.3%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9978 ( 99.8%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9996 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)   9993 ( 99.9%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_hit_ibtb_miss #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_hit_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652723
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x520fd9ad13f7 (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x037)
+ extra_training: 0x4d4ed9ad13df (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x01f)
+         victim: 0x6f4dc9ad13df (tag: 0x1ad, set: 0x04f, PC[5:0]: 0x01f)
+
+        target0: 0x520fd9ad15c7 (offset: 0x1d0)
+   target1_mock: 0x6f4dc9ae23df (offset: 0x11000)
+  target1_short: 0x6f4dc9ad15c7 (offset: 0x1e8)
+   target1_near: 0x6f4dd9ad15c7 (offset: 0x100001e8)
+        target2: 0x4d4ed9ad1640 (offset: 0x261)
+  target2_short: 0x6f4dc9ad1640 (offset: 0x261)
+   target2_near: 0x6f4dd9ad1640 (offset: 0x10000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+ iBTB Evict set: 0x3c20a48f7c1f (tag: 0x08f, set: 0x1f0, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x363c96da33df (tag: 0x2da, set: 0x0cf, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x372262541c5f (tag: 0x254, set: 0x071, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x3ab007a1441f (tag: 0x3a1, set: 0x110, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x3ddcf33dd85f (tag: 0x33d, set: 0x361, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x37d143420f1f (tag: 0x342, set: 0x03c, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x317ee47b575f (tag: 0x07b, set: 0x15d, PC[5:0]: 0x01f)
+ iBTB Evict set: 0x3e556e75aadf (tag: 0x275, set: 0x2ab, PC[5:0]: 0x01f)
+
+
+                     SHORT            NEAR             FAR         | SHORT EXTRA      NEAR EXTRA       FAR EXTRA
+           INITIAL:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_hit_ibtb_miss #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_hit_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652725
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5e999965d02e (tag: 0x165, set: 0x340, PC[5:0]: 0x02e)
+ extra_training: 0x45bbd965d019 (tag: 0x165, set: 0x340, PC[5:0]: 0x019)
+         victim: 0x629da165d019 (tag: 0x165, set: 0x340, PC[5:0]: 0x019)
+
+        target0: 0x5e999965d1fe (offset: 0x1d0)
+   target1_mock: 0x629da166e019 (offset: 0x11000)
+  target1_short: 0x629da165d1fe (offset: 0x1e5)
+   target1_near: 0x629d9965d1fe (offset: 0x7fffe1b)
+        target2: 0x45bbd965d27a (offset: 0x261)
+  target2_short: 0x629da165d27a (offset: 0x261)
+   target2_near: 0x629dd965d27a (offset: 0x38000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+ iBTB Evict set: 0x342b72ad6559 (tag: 0x2ad, set: 0x195, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3e3bb901aed9 (tag: 0x101, set: 0x2bb, PC[5:0]: 0x019)
+ iBTB Evict set: 0x323ba8685b99 (tag: 0x068, set: 0x16e, PC[5:0]: 0x019)
+ iBTB Evict set: 0x35256158f8d9 (tag: 0x158, set: 0x3e3, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3723964e2699 (tag: 0x24e, set: 0x09a, PC[5:0]: 0x019)
+ iBTB Evict set: 0x373379e37319 (tag: 0x1e3, set: 0x1cc, PC[5:0]: 0x019)
+ iBTB Evict set: 0x3b8cc3e8ad59 (tag: 0x3e8, set: 0x2b5, PC[5:0]: 0x019)
+ iBTB Evict set: 0x383fabecf119 (tag: 0x3ec, set: 0x3c4, PC[5:0]: 0x019)
+
+
+                     SHORT            NEAR             FAR         | SHORT EXTRA      NEAR EXTRA       FAR EXTRA
+           INITIAL:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)     10 (100.0%)      0 (  0.0%)  (/10)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+            VERIFY:      0 (  0.0%)      0 (  0.0%)      0 (  0.0%)|      0 (  0.0%)  10000 (100.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_miss_ibtb_hit #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_miss_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652726
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x56f20a3de1e4 (tag: 0x23d, set: 0x387, PC[5:0]: 0x024)
+ extra_training: 0x46ed763de1c6 (tag: 0x23d, set: 0x387, PC[5:0]: 0x006)
+         victim: 0x6534d63de1c6 (tag: 0x23d, set: 0x387, PC[5:0]: 0x006)
+
+        target0: 0x56f20a3de3b4 (offset: 0x1d0)
+   target1_mock: 0x6534d63ef1c6 (offset: 0x11000)
+  target1_short: 0x6534d63de3b4 (offset: 0x1ee)
+   target1_near: 0x65340a3de3b4 (offset: 0xcbfffe12)
+        target2: 0x46ed763de427 (offset: 0x261)
+  target2_short: 0x6534d63de427 (offset: 0x261)
+   target2_near: 0x6534763de427 (offset: 0x5ffffd9f)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+  BTB Evict set: 0x20f4eeb4e1f7 (tag: 0x2b4, set: 0x387, PC[5:0]: 0x037)
+  BTB Evict set: 0x20b9447de1cd (tag: 0x07d, set: 0x387, PC[5:0]: 0x00d)
+  BTB Evict set: 0x20eb3c3de1ff (tag: 0x03d, set: 0x387, PC[5:0]: 0x03f)
+  BTB Evict set: 0x20016f88e1cc (tag: 0x388, set: 0x387, PC[5:0]: 0x00c)
+  BTB Evict set: 0x2062e977e1e4 (tag: 0x177, set: 0x387, PC[5:0]: 0x024)
+  BTB Evict set: 0x208224cee1d3 (tag: 0x0ce, set: 0x387, PC[5:0]: 0x013)
+  BTB Evict set: 0x2034bc05e1d7 (tag: 0x005, set: 0x387, PC[5:0]: 0x017)
+  BTB Evict set: 0x2000e16de1ef (tag: 0x16d, set: 0x387, PC[5:0]: 0x02f)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_miss_ibtb_hit #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_miss_ibtb_hit -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652733
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x5838cdfee96e (tag: 0x1fe, set: 0x3a5, PC[5:0]: 0x02e)
+ extra_training: 0x4640cdfee948 (tag: 0x1fe, set: 0x3a5, PC[5:0]: 0x008)
+         victim: 0x690f4dfee948 (tag: 0x1fe, set: 0x3a5, PC[5:0]: 0x008)
+
+        target0: 0x5838cdfeeb3e (offset: 0x1d0)
+   target1_mock: 0x690f4dfff948 (offset: 0x11000)
+  target1_short: 0x690f4dfeeb3e (offset: 0x1f6)
+   target1_near: 0x690fcdfeeb3e (offset: 0x800001f6)
+        target2: 0x4640cdfeeba9 (offset: 0x261)
+  target2_short: 0x690f4dfeeba9 (offset: 0x261)
+   target2_near: 0x690fcdfeeba9 (offset: 0x80000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+  BTB Evict set: 0x20c7ff08e96d (tag: 0x308, set: 0x3a5, PC[5:0]: 0x02d)
+  BTB Evict set: 0x203f950ae96a (tag: 0x10a, set: 0x3a5, PC[5:0]: 0x02a)
+  BTB Evict set: 0x20e5063ce96f (tag: 0x23c, set: 0x3a5, PC[5:0]: 0x02f)
+  BTB Evict set: 0x20d93492e960 (tag: 0x092, set: 0x3a5, PC[5:0]: 0x020)
+  BTB Evict set: 0x2001eb77e947 (tag: 0x377, set: 0x3a5, PC[5:0]: 0x007)
+  BTB Evict set: 0x20a91316e94f (tag: 0x316, set: 0x3a5, PC[5:0]: 0x00f)
+  BTB Evict set: 0x20f1cacee941 (tag: 0x2ce, set: 0x3a5, PC[5:0]: 0x001)
+  BTB Evict set: 0x2027874be94b (tag: 0x34b, set: 0x3a5, PC[5:0]: 0x00b)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_miss_ibtb_miss #1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_miss_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652740
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x55cd10c41c74 (tag: 0x0c4, set: 0x071, PC[5:0]: 0x034)
+ extra_training: 0x4040e8c41c58 (tag: 0x0c4, set: 0x071, PC[5:0]: 0x018)
+         victim: 0x629724c41c58 (tag: 0x0c4, set: 0x071, PC[5:0]: 0x018)
+
+        target0: 0x55cd10c41e44 (offset: 0x1d0)
+   target1_mock: 0x629724c52c58 (offset: 0x11000)
+  target1_short: 0x629724c41e44 (offset: 0x1ec)
+   target1_near: 0x629710c41e44 (offset: 0x13fffe14)
+        target2: 0x4040e8c41eb9 (offset: 0x261)
+  target2_short: 0x629724c41eb9 (offset: 0x261)
+   target2_near: 0x6297e8c41eb9 (offset: 0xc4000261)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+  BTB Evict set: 0x20e532f31c53 (tag: 0x2f3, set: 0x071, PC[5:0]: 0x013)
+  BTB Evict set: 0x207f7bf51c67 (tag: 0x3f5, set: 0x071, PC[5:0]: 0x027)
+  BTB Evict set: 0x2051b1291c4d (tag: 0x129, set: 0x071, PC[5:0]: 0x00d)
+  BTB Evict set: 0x2086cf811c55 (tag: 0x381, set: 0x071, PC[5:0]: 0x015)
+  BTB Evict set: 0x20761b5c1c49 (tag: 0x35c, set: 0x071, PC[5:0]: 0x009)
+  BTB Evict set: 0x20a6df141c77 (tag: 0x314, set: 0x071, PC[5:0]: 0x037)
+  BTB Evict set: 0x206336b51c62 (tag: 0x2b5, set: 0x071, PC[5:0]: 0x022)
+  BTB Evict set: 0x209f40c51c42 (tag: 0x0c5, set: 0x071, PC[5:0]: 0x002)
+ iBTB Evict set: 0x3e01e59b6ad8 (tag: 0x19b, set: 0x1ab, PC[5:0]: 0x018)
+ iBTB Evict set: 0x31e21743a458 (tag: 0x343, set: 0x291, PC[5:0]: 0x018)
+ iBTB Evict set: 0x3d578e1aa718 (tag: 0x21a, set: 0x29c, PC[5:0]: 0x018)
+ iBTB Evict set: 0x342e968e2b18 (tag: 0x28e, set: 0x0ac, PC[5:0]: 0x018)
+ iBTB Evict set: 0x3f80d424e658 (tag: 0x024, set: 0x399, PC[5:0]: 0x018)
+ iBTB Evict set: 0x3745eb349f98 (tag: 0x334, set: 0x27e, PC[5:0]: 0x018)
+ iBTB Evict set: 0x3333b7ce8458 (tag: 0x3ce, set: 0x211, PC[5:0]: 0x018)
+ iBTB Evict set: 0x30e102637718 (tag: 0x263, set: 0x1dc, PC[5:0]: 0x018)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+|| dir_ind_btb_miss_ibtb_miss #2
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c branch_evict.c flip_tests.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DSKYMONT -Ddir_ind_btb_miss_ibtb_miss -DSUPSRESS_MITIGATION_INFO
+Running on CPU: 4
+Seed: 1740652752
+=========================== MAIN CONFIGURATION ===========================
+       Training Domain:     USER |          Victim Domain:     USER
+ Training History type:     NONE |    Victim History type: COND BRS
+  Training Branch Type: DIR_UNCO |     Victim Branch Type:  IND_JMP
+ Prefetch side-channel:        0 |
+==========================================================================
+
+       training: 0x519c5161e07b (tag: 0x161, set: 0x381, PC[5:0]: 0x03b)
+ extra_training: 0x4a3f7961e04b (tag: 0x161, set: 0x381, PC[5:0]: 0x00b)
+         victim: 0x69159961e04b (tag: 0x161, set: 0x381, PC[5:0]: 0x00b)
+
+        target0: 0x519c5161e24b (offset: 0x1d0)
+   target1_mock: 0x69159962f04b (offset: 0x11000)
+  target1_short: 0x69159961e24b (offset: 0x200)
+   target1_near: 0x69155161e24b (offset: 0x47fffe00)
+        target2: 0x4a3f7961e2ac (offset: 0x261)
+  target2_short: 0x69159961e2ac (offset: 0x261)
+   target2_near: 0x69157961e2ac (offset: 0x1ffffd9f)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+   entry_off_c2: 0x3
+
+  BTB Evict set: 0x204d9c3de058 (tag: 0x03d, set: 0x381, PC[5:0]: 0x018)
+  BTB Evict set: 0x2096faeae065 (tag: 0x2ea, set: 0x381, PC[5:0]: 0x025)
+  BTB Evict set: 0x20abb4cde06a (tag: 0x0cd, set: 0x381, PC[5:0]: 0x02a)
+  BTB Evict set: 0x2044c69be057 (tag: 0x29b, set: 0x381, PC[5:0]: 0x017)
+  BTB Evict set: 0x20b9b180e074 (tag: 0x180, set: 0x381, PC[5:0]: 0x034)
+  BTB Evict set: 0x204a140fe05f (tag: 0x00f, set: 0x381, PC[5:0]: 0x01f)
+  BTB Evict set: 0x20de1d4ce062 (tag: 0x14c, set: 0x381, PC[5:0]: 0x022)
+  BTB Evict set: 0x20f80c39e041 (tag: 0x039, set: 0x381, PC[5:0]: 0x001)
+ iBTB Evict set: 0x340c03b23ccb (tag: 0x3b2, set: 0x0f3, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x35b32906618b (tag: 0x106, set: 0x186, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x3b68c085bd0b (tag: 0x085, set: 0x2f4, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x37c8fb9a414b (tag: 0x39a, set: 0x105, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x3125e4c4780b (tag: 0x0c4, set: 0x1e0, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x36299c0ce50b (tag: 0x00c, set: 0x394, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x3bb1b021aacb (tag: 0x021, set: 0x2ab, PC[5:0]: 0x00b)
+ iBTB Evict set: 0x330481abbdcb (tag: 0x1ab, set: 0x2f7, PC[5:0]: 0x00b)
+
+
+Iteration: 10000
+Iteration: 20000
+Iteration: 30000
+Iteration: 40000
+Iteration: 50000 No signal... exiting

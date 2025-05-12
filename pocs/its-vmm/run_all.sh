@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+OWN_DIR=`dirname $0`
+
+printf "\n>> TESTING USER TO USER\n"
+ARCH=$ARCH TEST=TEST_USER_USER ${OWN_DIR}/run.sh
+
+printf "\n>> TESTING USER TO KERNEL\n"
+ARCH=$ARCH TEST=TEST_USER_KERNEL ${OWN_DIR}/run.sh
+
+printf "\n>> TESTING KERNEL TO KERNEL\n"
+ARCH=$ARCH TEST=TEST_KERNEL_KERNEL ${OWN_DIR}/run.sh
+
+printf "\n>> TESTING USER TO VMM\n"
+ARCH=$ARCH TEST=TEST_USER_VMM ${OWN_DIR}/run.sh
+
+printf "\n>> TESTING KERNEL TO VMM\n"
+ARCH=$ARCH TEST=TEST_KERNEL_VMM ${OWN_DIR}/run.sh
