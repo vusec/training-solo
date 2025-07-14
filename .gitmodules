@@ -1,0 +1,3 @@
+[submodule "analysis/inspectre-gadget"]
+	path = analysis/inspectre-gadget
+	url = https://github.com/vusec/inspectre-gadget

@@ -1,0 +1,15 @@
+# Used for analyzing from syscall entry
+InitializeControlledPTRegs: True
+AvoidLinuxKernelErrorPaths: True
+HookCommonLinuxKernelFunctions: True
+LogLevel: 1
+STLForwarding: True
+
+Z3Timeout: 10000 # ms = 10s
+MaxBB: 100
+DistributeShifts: True
+TransmissionGadgets: False
+TaintedFunctionPointers: True
+NonTaintedFunctionPointers: True
+TaintedFunctionPointersRegisterDereference : True
+SecretDependentBranches: False
