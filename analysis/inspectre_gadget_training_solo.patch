@@ -1,0 +1,3441 @@
+diff --git a/analyzer/analysis/baseControlAnalysis.py b/analyzer/analysis/baseControlAnalysis.py
+index 8223dbd..3739cc4 100644
+--- a/analyzer/analysis/baseControlAnalysis.py
++++ b/analyzer/analysis/baseControlAnalysis.py
+@@ -14,6 +14,7 @@ from .dependencyGraph import DepGraph, is_expr_controlled
+ from ..scanner.annotations import *
+ from ..scanner.memory import *
+ from ..shared.transmission import *
++from ..shared.secretDependentBranch import *
+ from ..shared.logger import *
+ from ..shared.astTransform import *
+ # autopep8: on
+@@ -110,3 +111,11 @@ def analyse(t: Transmission):
+     t.properties["deps"] = d
+ 
+     l.warning(f"===========================")
++
++
++def analyse_secret_dependent_branch(sdb : SecretDependentBranch):
++
++    # First analyze the transmission components
++    analyse(sdb)
++
++    # TODO: Check if the cmp_value depends on the transmission or secret address
+diff --git a/analyzer/analysis/branchControlAnalysis.py b/analyzer/analysis/branchControlAnalysis.py
+index 0063f99..bb99d3e 100644
+--- a/analyzer/analysis/branchControlAnalysis.py
++++ b/analyzer/analysis/branchControlAnalysis.py
+@@ -15,6 +15,7 @@ from ..shared.astTransform import ConditionType
+ from ..scanner.annotations import *
+ from ..scanner.memory import *
+ from ..shared.transmission import *
++from ..shared.secretDependentBranch import *
+ from ..shared.logger import *
+ # autopep8: on
+ 
+@@ -117,3 +118,11 @@ def analyse(t: Transmission):
+     l.warning(f"Cmove control with constraints: {t.properties['cmove_control_type']}")
+ 
+     l.warning(f"===========================")
++
++
++def analyse_secret_dependent_branch(sdb : SecretDependentBranch):
++
++    # First analyze the transmission component
++    analyse(sdb)
++
++    # TODO: Should do branch control analysis for cmp_value?
+diff --git a/analyzer/analysis/pipeline.py b/analyzer/analysis/pipeline.py
+index f6a7f5c..4b4c6ae 100644
+--- a/analyzer/analysis/pipeline.py
++++ b/analyzer/analysis/pipeline.py
+@@ -11,7 +11,8 @@ import os
+ import csv
+ from collections.abc import MutableMapping
+ 
+-from . import transmissionAnalysis, baseControlAnalysis, branchControlAnalysis, pathAnalysis, requirementsAnalysis, rangeAnalysis, bitsAnalysis, tfpAnalysis
++from . import transmissionAnalysis, tfpAnalysis, secretDependentBranchAnalysis
++from . import baseControlAnalysis, branchControlAnalysis, pathAnalysis, requirementsAnalysis, rangeAnalysis, bitsAnalysis
+ from ..asmprinter.asmprinter import *
+ from ..shared.logger import *
+ from ..shared.transmission import *
+@@ -31,6 +32,7 @@ class AnalysisPipeline:
+     name: str
+     # Entrypoint address
+     gadget_address: int
++    gadget_symbol: str
+     proj: angr.Project
+     # Output configurations
+     asm_folder: str
+@@ -40,8 +42,10 @@ class AnalysisPipeline:
+     # Stats
+     n_found_transmissions : int
+     n_found_tainted_function_pointers : int
++    n_found_secret_dependent_branches : int
+     n_final_transmissions : int
+     n_final_tainted_function_pointers : int
++    n_final_secret_dependent_branches : int
+ 
+ 
+     def __init__(self, name, gadget_address, proj, asm_folder, csv_filename, tfp_csv_filename):
+@@ -49,14 +53,19 @@ class AnalysisPipeline:
+         self.gadget_address = gadget_address
+         self.proj = proj
+ 
++        symbol = self.proj.loader.find_symbol(self.gadget_address, fuzzy=True)
++        self.gadget_symbol = symbol.name if symbol else ""
++
+         self.asm_folder = asm_folder
+         self.csv_filename = csv_filename
+         self.tfp_csv_filename = tfp_csv_filename
+ 
+         self.n_found_transmissions = 0
+         self.n_found_tainted_function_pointers = 0
++        self.n_found_secret_dependent_branches = 0
+         self.n_final_transmissions = 0
+         self.n_final_tainted_function_pointers = 0
++        self.n_final_secret_dependent_branches = 0
+ 
+ 
+     def analyze_transmission(self, potential_t: TransmissionExpr):
+@@ -65,10 +74,13 @@ class AnalysisPipeline:
+         transmissions = transmissionAnalysis.get_transmissions(potential_t)
+ 
+         for t in transmissions:
+-            l.info(f"Analyzing {t.transmission.expr}...")
++            l.info(f"Analyzing TRANS @{hex(t.pc)}: {t.transmission.expr}")
+             t.uuid = str(uuid.uuid4())
+             t.name = self.name
+             t.address = self.gadget_address
++            pc_symbol = self.proj.loader.find_symbol(t.pc, fuzzy=True)
++            t.pc_symbol = pc_symbol.name if pc_symbol else ""
++            t.address_symbol = self.gadget_symbol
+             baseControlAnalysis.analyse(t)
+             pathAnalysis.analyse(t)
+             requirementsAnalysis.analyse(t)
+@@ -105,13 +117,16 @@ class AnalysisPipeline:
+     def analyze_tainted_function_pointer(self, t: TaintedFunctionPointer):
+ 
+         self.n_found_tainted_function_pointers += 1
+-        tfps = tfpAnalysis.analyse(t)
++        tainted_function_pointers = tfpAnalysis.analyse(t)
+ 
+-        for tfp in tfps:
+-            l.info(f"Analyzing @{hex(tfp.pc)}: {tfp.expr}")
++        for tfp in tainted_function_pointers:
++            l.info(f"Analyzing TFP   @{hex(tfp.pc)}: {tfp.expr}")
+             tfp.uuid = str(uuid.uuid4())
+             tfp.name = self.name
+             tfp.address = self.gadget_address
++            pc_symbol = self.proj.loader.find_symbol(tfp.pc, fuzzy=True)
++            tfp.pc_symbol = pc_symbol.name if pc_symbol else ""
++            tfp.address_symbol = self.gadget_symbol
+             pathAnalysis.analyse_tfp(tfp)
+             requirementsAnalysis.analyse_tfp(tfp)
+ 
+@@ -139,6 +154,54 @@ class AnalysisPipeline:
+                 l.info(f"Dumped CSV to {self.tfp_csv_filename}")
+ 
+ 
++    def analyze_secret_dependent_branch(self, s: SecretDependentBranch):
++
++        self.n_found_secret_dependent_branches += 1
++        secret_dependent_branches = secretDependentBranchAnalysis.get_secret_dependent_branches(s)
++
++        for sdb in secret_dependent_branches:
++            l.info(f"Analyzing SDB   @{hex(sdb.pc)}: {sdb.sdb_expr} <> {sdb.cmp_value.expr}")
++            sdb.uuid = str(uuid.uuid4())
++            sdb.name = self.name
++            sdb.address = self.gadget_address
++            pc_symbol = self.proj.loader.find_symbol(sdb.pc, fuzzy=True)
++            sdb.pc_symbol = pc_symbol.name if pc_symbol else ""
++            sdb.address_symbol = self.gadget_symbol
++            baseControlAnalysis.analyse_secret_dependent_branch(sdb)
++            pathAnalysis.analyse(sdb)
++            requirementsAnalysis.analyse_secret_dependent_branch(sdb)
++
++            try:
++                rangeAnalysis.analyze_secret_dependent_branch(sdb)
++            except Exception as e:
++                # TODO: In very few instances, our range analysis fails. Instead of
++                # interrupting the analysis right away, we want to continue to
++                # the next gadget. There are many reasons why the range analysis
++                # can fail, and some of them might be fixed.
++                # However, since the number of errors we encountered is very low,
++                # this has not been deemed to be a priority for now.
++                l.critical("Range analysis error: bailing out")
++                report_error(e, where="range_analysis", start_addr=hex(self.gadget_address), error_type="RANGE")
++                continue
++
++
++            bitsAnalysis.analyse(sdb)
++            branchControlAnalysis.analyse(sdb)
++
++            # Remove the dependency graph before printing.
++            sdb.properties["deps"] = None
++
++            self.n_final_secret_dependent_branches += 1
++            l_verbose.info(sdb)
++
++            if self.asm_folder != "":
++                output_secret_dependent_branch_to_file(sdb, self.proj, self.asm_folder)
++                l.info(f"Dumped annotated ASM to {self.asm_folder}")
++            if self.csv_filename != "":
++                append_to_csv(self.csv_filename, [sdb])
++            l.info(f"Dumped properties to {self.csv_filename}")
++
++
+ 
+ def flatten_dict(dictionary, parent_key='', separator='_'):
+     """
+diff --git a/analyzer/analysis/rangeAnalysis.py b/analyzer/analysis/rangeAnalysis.py
+index 5348650..a5c5264 100644
+--- a/analyzer/analysis/rangeAnalysis.py
++++ b/analyzer/analysis/rangeAnalysis.py
+@@ -5,6 +5,7 @@ from .range_strategies import *
+ # autopep8: off
+ from ..shared.transmission import *
+ from ..shared.taintedFunctionPointer import *
++from ..shared.secretDependentBranch import *
+ from ..shared.utils import *
+ from ..shared.logger import *
+ from ..shared.config import *
+@@ -70,25 +71,23 @@ def calculate_range(component: TransmissionComponent, constraints, branches):
+ def analyse(t: Transmission):
+     l.warning(f"========= [RANGE] ==========")
+ 
+-    # Pre-compute constraint sets.
+-    constr = []
+-    constr.extend([x[1] for x in t.constraints])
+-
+-    constr_with_branches = []
+-    if len(t.branches) > 0:
+-        constr_with_branches.extend([x[1] for x in t.constraints])
+-        constr_with_branches.extend([x[1] for x in t.branches])
+-
+     # Calculate ranges for each component
+     for c in [t.base, t.transmitted_secret, t.secret_address, t.transmission]:
+-        calculate_range(c, constr, constr_with_branches)
++        if c != None:
++            constr = [x[1] for x in c.constraints]
++            constr_with_branches = [x[1] for x in c.branches]
++            constr_with_branches.extend(constr)
++            calculate_range(c, constr, constr_with_branches)
+ 
+     # Calculate ranges for base sub-components.
+-    if t.base != None:
++    if t.base != None and t.independent_base != None:
+         if t.properties['direct_dependent_base_expr'] == None and t.properties['indirect_dependent_base_expr'] == None:
+             t.independent_base.range = t.base.range
+             t.independent_base.range_with_branches = t.base.range_with_branches
+         else:
++            constr = [x[1] for x in t.independent_base.constraints]
++            constr_with_branches = [x[1] for x in t.independent_base.branches]
++            constr_with_branches.extend(constr)
+             calculate_range(t.independent_base, constr, constr_with_branches)
+ 
+ 
+@@ -102,10 +101,48 @@ def analyse(t: Transmission):
+ 
+ def analyse_tfp(t: TaintedFunctionPointer):
+     l.warning(f"========= [RANGE] ==========")
+-    for r in t.registers:
+-        if t.registers[r].control == TFPRegisterControlType.CONTROLLED or t.registers[r].control == TFPRegisterControlType.POTENTIAL_SECRET:
+-            t.registers[r].range = get_ast_ranges([x[1] for x in t.registers[r].constraints], t.registers[r].expr)
++    for r in t.registers.values():
++        if r.control in (ControlType.REQUIRES_MEM_LEAK, ControlType.REQUIRES_MEM_MASSAGING, ControlType.CONTROLLED) \
++            or r.control_type == TFPRegisterControlType.IS_TFP_REGISTER:
++
++            constr = [x[1] for x in r.constraints]
++            constr_with_branches = [x[1] for x in r.branches]
++            constr_with_branches.extend(constr)
++            calculate_range(r, constr, constr_with_branches)
++
++            if r.controlled_expr != None:
++                r.controlled_range = get_ast_ranges(constr, r.controlled_expr)
++                if len(r.branches) > 0:
++                    r.controlled_range_with_branches = get_ast_ranges(constr_with_branches, r.controlled_expr)
++                else:
++                    r.controlled_range_with_branches = r.controlled_range
++
++    # Calculate for tfp expr
++    constr = [x[1] for x in t.constraints]
++    constr_with_branches = [x[1] for x in t.branches]
++    constr_with_branches.extend(constr)
++    calculate_range(t, constr, constr_with_branches)
++
++    l.warning("==========================")
++
++
++def analyze_secret_dependent_branch(sdb: SecretDependentBranch):
++
++    # First analyze the transmission components
++    analyse(sdb)
++
++    # Pre-compute constraint sets.
++    constr = []
++    constr.extend([x[1] for x in sdb.constraints])
++
++    constr_with_branches = []
++    if len(sdb.branches) > 0:
++        constr_with_branches.extend([x[1] for x in sdb.constraints])
++        constr_with_branches.extend([x[1] for x in sdb.branches])
+ 
+-    t.range = get_ast_ranges([x[1] for x in t.constraints], t.expr)
++    calculate_range(sdb.cmp_value, constr, constr_with_branches)
++    calculate_range(sdb.controlled_cmp_value, constr, constr_with_branches)
+ 
++    l.warning(f"cmp_value range:  {sdb.cmp_value.range}")
++    l.warning(f"controlled_cmp_value range:  {'NONE' if sdb.controlled_cmp_value == None else sdb.controlled_cmp_value.range}")
+     l.warning("==========================")
+diff --git a/analyzer/analysis/requirementsAnalysis.py b/analyzer/analysis/requirementsAnalysis.py
+index e9df0d5..4a13535 100644
+--- a/analyzer/analysis/requirementsAnalysis.py
++++ b/analyzer/analysis/requirementsAnalysis.py
+@@ -10,6 +10,7 @@ import sys
+ # autopep8: off
+ from ..shared.transmission import *
+ from ..shared.taintedFunctionPointer import *
++from ..shared.secretDependentBranch import *
+ from ..shared.utils import *
+ from ..shared.astTransform import *
+ from ..shared.logger import *
+@@ -154,6 +155,33 @@ def analyse_tfp(t: TaintedFunctionPointer):
+     l.warning(f"========= [REQS] ==========")
+     for r in t.registers:
+         t.registers[r].requirements = get_requirements(t.registers[r].expr)
++        t.registers[r].control = get_control(t.registers[r])
++
++        if t.registers[r].control in (ControlType.REQUIRES_MEM_LEAK, ControlType.REQUIRES_MEM_MASSAGING, ControlType.CONTROLLED):
++            t.controlled.append(r)
+ 
+     t.requirements = get_requirements(t.expr)
++    t.control = get_control(t)
++
++    l.warning("==========================")
++
++
++def analyse_secret_dependent_branch(sdb : SecretDependentBranch):
++
++    # First collect requirements for the transmission component
++    analyse(sdb)
++
++    # Add requirements for cmp_value
++    sdb.cmp_value.requirements = get_requirements(sdb.cmp_value.expr)
++    sdb.cmp_value.control = get_control(sdb.cmp_value)
++
++    if sdb.controlled_cmp_value != None:
++        sdb.controlled_cmp_value.requirements = get_requirements(sdb.controlled_cmp_value.expr)
++        sdb.controlled_cmp_value.control = get_control(sdb.controlled_cmp_value)
++
++    sdb.all_requirements.merge(sdb.cmp_value.requirements)
++    sdb.all_requirements_w_branches.merge(sdb.cmp_value.requirements)
++
++    l.warning(f"cmp_value_requirements:  {sdb.cmp_value.requirements}")
++    l.warning(f"controlled_cmp_value_requirements: {'NONE' if sdb.controlled_cmp_value == None else sdb.controlled_cmp_value.requirements}")
+     l.warning("==========================")
+diff --git a/analyzer/analysis/secretDependentBranchAnalysis.py b/analyzer/analysis/secretDependentBranchAnalysis.py
+new file mode 100644
+index 0000000..58a4297
+--- /dev/null
++++ b/analyzer/analysis/secretDependentBranchAnalysis.py
+@@ -0,0 +1,110 @@
++"""SecretDependentBranchAnalysis
++
++This analysis is responsible of identifying the branch sides that consist
++of the secret and value compared against
++"""
++
++import sys
++import claripy.ast.base
++import itertools
++
++from .dependencyGraph import *
++from .transmissionAnalysis import get_transmissions, canonicalize
++
++# autopep8: off
++from ..shared.logger import *
++from ..shared.astTransform import *
++from ..shared.config import *
++from ..shared.transmission import *
++from ..shared.secretDependentBranch import *
++from ..scanner.annotations import *
++# autopep8: on
++
++l = get_logger("SecretDependentBranchAnalysis")
++
++
++def get_secret_dependent_branches(potential_sdb : SecretDependentBranchExpr) -> list[SecretDependentBranch]:
++    """
++    Analyze an expression marked as a possible secret dependent branch (e.g.
++    a branch guard consisting of a secret) to identify its components.
++    For the 'secret side' of the comparison we use the logic from the
++    transmission component. We check both sides of the comparison if it contains
++    a secret.
++    """
++
++    l.warning(f"========= [AST] ==========")
++    l.warning(f"Analyzing SDP @{hex(potential_sdb.pc)}: {potential_sdb.expr}")
++
++    expr = potential_sdb.expr
++
++
++    if not isinstance(expr, claripy.ast.bool.Bool):
++        return []
++
++    if len(expr.args) == 1:
++        report_error(Exception(), hex(0), hex(0), error_type="get_secret_dependent_branches: Unexpected AST with args == 1")
++        return []
++
++    expr_right = expr.args[0]
++    expr_left = expr.args[1]
++
++    # Do some sanity checks on right left expressions
++    if isinstance(expr_right, claripy.ast.bool.Bool) and isinstance(expr_left, claripy.ast.bool.Bool):
++        # If expr has depth == 1, its simple 'True' or 'False'
++        # Do we need to fix operation of child expr?
++        if expr_right.depth == 1:
++            potential_sdb.expr = expr_left
++            return get_secret_dependent_branches(potential_sdb)
++
++        if expr_left.depth == 1:
++            potential_sdb.expr = expr_right
++            return get_secret_dependent_branches(potential_sdb)
++
++        return []
++
++    if isinstance(expr_right, claripy.ast.bool.Bool):
++        potential_sdb.expr = expr_right
++        return get_secret_dependent_branches(potential_sdb)
++
++    elif isinstance(expr_left, claripy.ast.bool.Bool):
++        potential_sdb.expr = expr_right
++        return get_secret_dependent_branches(potential_sdb)
++
++
++
++    secret_dependent_branches = []
++    # For both side combinations, do the analysis
++    for secret_expr, compared_expr in [[expr_right, expr_left], [expr_left, expr_right]]:
++
++        # Get all transmission for the secret_expr
++        potential_sdb.expr = secret_expr
++        all_transmissions = get_transmissions(potential_sdb)
++
++        # Now create a secret dependent branch for each transmission
++        for t in all_transmissions:
++            # We lower the transmission object to a SecretDependentBranch object
++            sdb = SecretDependentBranch(expr)
++            sdb.__dict__.update(t.__dict__)
++
++            # Init cmp_value
++            sdb.cmp_value.expr = compared_expr
++
++            # Collect controlled part of cmp_value
++            canonical_exprs = canonicalize(compared_expr, potential_sdb.pc)
++            controlled_members = []
++            for canonical_expr in canonical_exprs:
++                members = extract_summed_vals(canonical_expr.expr)
++
++                for ast in members:
++                    if is_attacker_controlled(ast):
++                        controlled_members.append(ast)
++
++            if len(controlled_members) > 0:
++                sdb.controlled_cmp_value.expr = generate_addition(controlled_members)
++            else:
++                sdb.controlled_cmp_value = None
++
++            # Done
++            secret_dependent_branches.append(sdb)
++
++    return secret_dependent_branches
+diff --git a/analyzer/analysis/tfpAnalysis.py b/analyzer/analysis/tfpAnalysis.py
+index 6a71c3a..27680fd 100644
+--- a/analyzer/analysis/tfpAnalysis.py
++++ b/analyzer/analysis/tfpAnalysis.py
+@@ -10,8 +10,10 @@ from ..shared.utils import *
+ from ..shared.logger import *
+ from ..shared.config import *
+ from ..shared.astTransform import *
++from ..scanner.annotations import *
+ from ..analysis.dependencyGraph import DepGraph, is_expr_controlled
+-from ..scanner.annotations import get_load_annotation, LoadAnnotation
++from ..scanner.annotations import get_load_annotation
++from .transmissionAnalysis import canonicalize
+ # autopep8: on
+ 
+ l = get_logger("TFPAnalysis")
+@@ -54,7 +56,7 @@ def is_potential_secret(d: DepGraph, expr: claripy.BV, tfp_expr: claripy.BV):
+     return has_load_anno
+ 
+ 
+-def analyse(t: TaintedFunctionPointer):
++def analyse(t: TaintedFunctionPointer) -> list[TaintedFunctionPointer]:
+     l.warning(f"========= [TFP] ==========")
+ 
+     substitutions = []
+@@ -62,7 +64,12 @@ def analyse(t: TaintedFunctionPointer):
+ 
+     # Handle if-then-else statements in register expressions.
+     for r in t.registers:
+-        asts = split_conditions(t.registers[r].expr, simplify=False, addr=t.address)
++        try:
++            asts = split_conditions(t.registers[r].expr, simplify=False, addr=t.address)
++        except SplitTooManyNestedIfException:
++            # Lets continue with the non-splitted register expr
++            continue
++
+ 
+         assert(len(asts) >= 1)
+         if len(asts) > 1:
+@@ -94,36 +101,69 @@ def analyse(t: TaintedFunctionPointer):
+     # Analyse tfps
+     final_tfps = []
+     for tfp in tfps:
+-        # If the TFP is not really controlled, skip.
+-        if not is_sym_expr(tfp.expr) or not is_expr_controlled(tfp.expr):
+-            continue
++
++        if not global_config['NonTaintedFunctionPointers']:
++            # If the TFP is not controlled, skip.
++            if (not is_sym_expr(tfp.expr) or not is_expr_controlled(tfp.expr)):
++                continue
+ 
+         d = get_dependency_graph(tfp)
+ 
++        tfp_controlled = is_expr_controlled(tfp.expr)
++
+         # Analyse registers control.
+         for r in tfp.registers:
+             if tfp.registers[r].reg == tfp.reg:
+-                tfp.registers[r].control = TFPRegisterControlType.IS_TFP_REGISTER
++                tfp.registers[r].control_type = TFPRegisterControlType.IS_TFP_REGISTER
+             elif not is_sym_expr(tfp.registers[r].expr) or not is_expr_controlled(tfp.registers[r].expr):
+-                tfp.registers[r].control = TFPRegisterControlType.UNCONTROLLED
+-                tfp.uncontrolled.append(r)
+-            elif not (d.is_independently_controllable(tfp.registers[r].expr, [tfp.expr], check_constraints=True, check_addr=False)
++                tfp.registers[r].control_type = TFPRegisterControlType.UNCONTROLLED
++                # Do not add dereferenced registers (not interesting)
++                if not tfp.registers[r].is_dereferenced:
++                    tfp.uncontrolled.append(r)
++            elif tfp_controlled and not (d.is_independently_controllable(tfp.registers[r].expr, [tfp.expr], check_constraints=True, check_addr=False)
+                        and d.is_independently_controllable(tfp.expr, [tfp.registers[r].expr], check_constraints=True, check_addr=False)):
+-                tfp.registers[r].control = TFPRegisterControlType.DEPENDS_ON_TFP_EXPR
++                tfp.registers[r].control_type = TFPRegisterControlType.DEPENDS_ON_TFP_EXPR
+                 tfp.aliasing.append(r)
+-            elif not (d.is_independently_controllable(tfp.registers[r].expr, [tfp.expr], check_constraints=True, check_addr=True)
++            elif tfp_controlled and not (d.is_independently_controllable(tfp.registers[r].expr, [tfp.expr], check_constraints=True, check_addr=True)
+                       and d.is_independently_controllable(tfp.expr, [tfp.registers[r].expr], check_constraints=True, check_addr=True)):
+-                tfp.registers[r].control =  TFPRegisterControlType.INDIRECTLY_DEPENDS_ON_TFP_EXPR
++                tfp.registers[r].control_type =  TFPRegisterControlType.INDIRECTLY_DEPENDS_ON_TFP_EXPR
+                 tfp.aliasing.append(r)
+             elif is_sym_var(tfp.registers[r].expr) and is_same_var(tfp.registers[r].expr, tfp.registers[r].reg):
+-                tfp.registers[r].control = TFPRegisterControlType.UNMODIFIED
++                tfp.registers[r].control_type = TFPRegisterControlType.UNMODIFIED
+                 tfp.unmodified.append(r)
+             elif is_potential_secret(d, tfp.registers[r].expr, tfp.expr):
+-                tfp.registers[r].control = TFPRegisterControlType.POTENTIAL_SECRET
++                tfp.registers[r].control_type = TFPRegisterControlType.POTENTIAL_SECRET
+                 tfp.secrets.append(r)
+             else:
+-                tfp.registers[r].control = TFPRegisterControlType.CONTROLLED
+-                tfp.controlled.append(r)
++                tfp.registers[r].control_type = TFPRegisterControlType.CONTROLLED
++                # We add controlled registers later
++
++        # Initialize controlled expr for each register
++        for r in tfp.registers:
++            expr = tfp.registers[r].expr
++
++            if expr == None:
++                continue
++
++            try:
++                canonical_exprs = canonicalize(expr, tfp.pc)
++            except SplitTooManyNestedIfException:
++                continue
++
++            controlled_members = []
++            controlled_members = []
++            for canonical_expr in canonical_exprs:
++                members = extract_summed_vals(canonical_expr.expr)
++
++                for ast in members:
++                    if is_attacker_controlled(ast):
++                        controlled_members.append(ast)
++
++            if len(controlled_members) > 0:
++                tfp.registers[r].controlled_expr = generate_addition(controlled_members)
++            else:
++                tfp.registers[r].controlled_expr = None
++
+ 
+         final_tfps.append(tfp)
+ 
+diff --git a/analyzer/analysis/transmissionAnalysis.py b/analyzer/analysis/transmissionAnalysis.py
+index c99010b..972f66e 100644
+--- a/analyzer/analysis/transmissionAnalysis.py
++++ b/analyzer/analysis/transmissionAnalysis.py
+@@ -147,7 +147,12 @@ def get_transmissions(potential_t: TransmissionExpr) -> list[Transmission]:
+     l.warning(f"Analyzing @{hex(potential_t.pc)}: {potential_t.expr}")
+ 
+     # Extract members of the transmission.
+-    canonical_exprs = canonicalize(potential_t.expr, potential_t.pc)
++    try:
++        canonical_exprs = canonicalize(potential_t.expr, potential_t.pc)
++    except SplitTooManyNestedIfException:
++        l.error("get_transmissions: Failed canonicalizing expression")
++        return []
++
+ 
+     transmissions = []
+     for canonical_expr in canonical_exprs:
+diff --git a/analyzer/analyzer.py b/analyzer/analyzer.py
+index c6973ac..12a718a 100644
+--- a/analyzer/analyzer.py
++++ b/analyzer/analyzer.py
+@@ -9,6 +9,7 @@ import yaml
+ import pickle
+ import angr
+ import claripy.ast.base
++from cle import Symbol
+ 
+ from .scanner.scanner import Scanner
+ from .analysis.pipeline import AnalysisPipeline
+@@ -27,7 +28,8 @@ def load_config(config_file):
+     if config_file:
+         with open(config_file, "r") as f:
+             config = yaml.safe_load(f)
+-        if not ('controlled_registers' in config or 'controlled_stack' in config):
++        if not ('controlled_registers' in config or 'controlled_stack' in config
++                or 'InitializeControlledPTRegs' in config):
+             l.critical("Invalid config file!")
+     else:
+         l.info("No config provided, using default config")
+@@ -61,8 +63,7 @@ def load_angr_project(binary_file: str, base_address, use_pickle) -> angr.Projec
+     return proj
+ 
+ 
+-
+-def analyse_gadget(proj, gadget_address, name, csv_filename, tfp_csv_filename, asm_folder):
++def analyse_gadget(proj, gadget_address, name, csv_filename, tfp_csv_filename, asm_folder, instructions_to_ignore, indirect_branch_targets):
+     """
+     Run the scanner from a single entrypoint and analyze the potential transmissions
+     found at symbolic-execution time.
+@@ -75,11 +76,17 @@ def analyse_gadget(proj, gadget_address, name, csv_filename, tfp_csv_filename, a
+ 
+     # Step 2. Analyze the code snippet with angr.
+     l.info(f"Analyzing gadget at address {hex(gadget_address)}...")
+-    s = Scanner(analysis_pipeline=analysis_pipeline)
+-    s.run(proj, gadget_address)
++    s = Scanner(name=name, analysis_pipeline=analysis_pipeline, indirect_branch_targets=indirect_branch_targets)
++
++    s.run(proj, gadget_address, instructions_to_ignore)
++
+ 
+-    l.info(f"Found {len(s.transmissions)} potential transmissions.")
+-    l.info(f"Found {len(s.calls)} potential tainted function pointers.")
++    if global_config['TransmissionGadgets']:
++        l.info(f"Found {len(s.transmissions)} potential transmissions.")
++    if global_config['TaintedFunctionPointers']:
++        l.info(f"Found {len(s.calls)} potential tainted function pointers.")
++    if global_config['SecretDependentBranches']:
++        l.info(f"Found {len(s.secretDependentBranches)} potential secret dependent branches.")
+ 
+ 
+     # Step 3. Analyze found gadgets (if not analyzed during scanning)
+@@ -91,11 +98,20 @@ def analyse_gadget(proj, gadget_address, name, csv_filename, tfp_csv_filename, a
+         for tfp in s.calls:
+             analysis_pipeline.analyze_tainted_function_pointer(tfp)
+ 
+-    l.info(f"Outputted {analysis_pipeline.n_final_transmissions} transmissions.")
+-    l.info(f"Outputted {analysis_pipeline.n_final_tainted_function_pointers} tainted function pointers.")
++        for sdb in s.secretDependentBranches:
++            analysis_pipeline.analyze_secret_dependent_branch(sdb)
++
++
++    if global_config['TransmissionGadgets']:
++        l.info(f"Outputted {analysis_pipeline.n_final_transmissions} transmissions.")
++    if global_config['TaintedFunctionPointers']:
++        l.info(f"Outputted {analysis_pipeline.n_final_tainted_function_pointers} tainted function pointers.")
++    if global_config['SecretDependentBranches']:
++        l.info(f"Outputted {analysis_pipeline.n_final_secret_dependent_branches} secret dependent branches.")
+ 
+ 
+-def run(binary, config_file, base_address, gadgets, cache_project, csv_filename="", tfp_csv_filename="", asm_folder="", symbol_binary=""):
++def run(binary, config_file, base_address, gadgets, cache_project, csv_filename="", tfp_csv_filename="", asm_folder="",
++        symbol_binary="", instructions_to_ignore="", indirect_branch_targets={}):
+     """
+     Run the analyzer on a binary.
+     """
+@@ -118,12 +134,32 @@ def run(binary, config_file, base_address, gadgets, cache_project, csv_filename=
+         l.info("Loading symbol binary...")
+         symbol_proj = load_angr_project(symbol_binary, base_address, cache_project)
+ 
+-        proj.loader.all_objects[0]._symbol_cache = symbol_proj.loader.all_objects[0]._symbol_cache
+         proj.loader.all_objects[0].symbols = symbol_proj.loader.all_objects[0].symbols
+         proj.loader.all_objects[0]._symbols_by_name = symbol_proj.loader.all_objects[0]._symbols_by_name
++
++        # This works for the Linux kernel binary, not tested on other inputs
++        # Adding the symbols to the text object ensures that fuzzy search
++        # using proj.loader.find_symbol() works
++        text_obj = proj.loader.find_object_containing(base_address)
++
++        if text_obj:
++            for symbol in symbol_proj.loader.all_objects[0].symbols:
++                if symbol.rebased_addr < text_obj.min_addr or\
++                    symbol.rebased_addr > text_obj.max_addr:
++                    continue
++
++                relative_addr = symbol.relative_addr - text_obj.mapped_base + symbol.owner.mapped_base
++                new_symbol = Symbol(owner=text_obj, name=symbol.name,
++                                    relative_addr=relative_addr, size=symbol.size,
++                                    sym_type=symbol._type)
++                new_symbol.resolved = symbol.resolved
++                new_symbol.resolvedby = symbol.resolvedby
++
++                text_obj.symbols.add(new_symbol)
++
+         del symbol_proj
+ 
+     # Run the Analyzer.
+     # TODO: Parallelize.
+     for g in gadgets:
+-        analyse_gadget(proj, g[0], g[1], csv_filename, tfp_csv_filename, asm_folder)
++        analyse_gadget(proj, g[0], g[1], csv_filename, tfp_csv_filename, asm_folder, instructions_to_ignore, indirect_branch_targets)
+diff --git a/analyzer/asmprinter/asmprinter.py b/analyzer/asmprinter/asmprinter.py
+index 96edcef..884e171 100644
+--- a/analyzer/asmprinter/asmprinter.py
++++ b/analyzer/asmprinter/asmprinter.py
+@@ -2,11 +2,13 @@ import angr
+ import claripy
+ import sys
+ from pathlib import Path
++from angr.misc.ansi import Color, color
+ 
+ # autopep8: off
+ from ..shared.logger import *
+ from ..shared.transmission import *
+ from ..shared.taintedFunctionPointer import *
++from ..shared.secretDependentBranch import *
+ from ..shared.utils import *
+ from ..scanner.annotations import *
+ # autopep8: on
+@@ -54,13 +56,21 @@ def print_annotations(t: Transmission):
+     print(a)
+ 
+ 
+-def print_annotated_assembly(proj, bbls, branches, expr, pc, secret_load_pc, is_tfp=False, color=True):
++def print_annotated_assembly(proj : angr.Project, bbls, branches, expr, pc, secret_load_pc, gadget_type=str, color=True):
+     # Branches.
+     proj.kb.comments = get_branch_comments(branches)
+     # Loads.
+     proj.kb.comments.update(get_load_comments(expr,secret_load_pc))
+     # Transmission
+-    if is_tfp:
++    if gadget_type == 'transmission':
++        all_annotations = set(get_annotations(expr))
++        secret_annotations = {a for a in all_annotations if isinstance(a, LoadAnnotation) and a.address == secret_load_pc}
++        annotations = replace_secret_annotations_with_name(secret_annotations, "Secret")
++        annotations += replace_secret_annotations_with_name(all_annotations - secret_annotations, "Attacker")
++        proj.kb.comments[pc] = str(set(annotations))
++        proj.kb.comments[pc] += " -> " + "TRANSMISSION"
++
++    elif gadget_type == 'tfp':
+         proj.kb.comments[pc] = str(set(replace_secret_annotations_with_name(get_annotations(expr), "Attacker")))
+         proj.kb.comments[pc] += " -> " + "TAINTED FUNCTION POINTER"
+     else:
+@@ -69,13 +79,28 @@ def print_annotated_assembly(proj, bbls, branches, expr, pc, secret_load_pc, is_
+         annotations = replace_secret_annotations_with_name(secret_annotations, "Secret")
+         annotations += replace_secret_annotations_with_name(all_annotations - secret_annotations, "Attacker")
+         proj.kb.comments[pc] = str(set(annotations))
+-        proj.kb.comments[pc] += " -> " + "TRANSMISSION"
++        proj.kb.comments[pc] += " -> " + "SECRET DEPENDENT BRANCH"
+ 
+ 
++    prev_symbol = None
+     output = ""
+     for bbl_addr in bbls:
++        # Symbol
++        symbol = proj.loader.find_symbol(bbl_addr, fuzzy=True)
++        # Disassembly adds symbol at the start of the function, we only
++        # add if we are not at the start and symbol differs from prev
++        if symbol != None and symbol.rebased_addr != bbl_addr and symbol != prev_symbol:
++            # Capstone did not add a symbol
++            max_bytes_per_line = 5
++            bytes_width = max_bytes_per_line * 3 + 3
++            output += " " * bytes_width + f";{symbol.name}+{bbl_addr-symbol.rebased_addr}:\n"
++
++        prev_symbol = symbol
++
++        # Add the assembly code
+         block = proj.factory.block(bbl_addr)
+         output += proj.analyses.Disassembly(ranges=[(block.addr, block.addr + block.size)]).render(color=color)
++
+         output += "\n"
+ 
+     proj.kb.comments = {}
+@@ -85,7 +110,7 @@ def output_gadget_to_file(t : Transmission, proj, path):
+     Path(path).mkdir(parents=True, exist_ok=True)
+     o = open(f"{path}/gadget_{t.name}_{hex(t.pc)}_{t.uuid}.asm", "a+")
+     o.write(f"----------------- TRANSMISSION -----------------\n")
+-    o.write(print_annotated_assembly(proj, t.bbls, t.branches, t.transmission.expr, t.pc, t.secret_load_pc, is_tfp=False, color=False))
++    o.write(print_annotated_assembly(proj, t.bbls, t.branches, t.transmission.expr, t.pc, t.secret_load_pc, 'transmission', color=False))
+     o.write(f"""
+ {'-'*48}
+ uuid: {t.uuid}
+@@ -116,33 +141,41 @@ Branches: {[(hex(addr), expr, outcome) for addr, expr, outcome in t.branches]}
+     o.close()
+ 
+ 
+-def has_aliasing(reg):
+-    return reg.control == TFPRegisterControlType.DEPENDS_ON_TFP_EXPR or reg.control == TFPRegisterControlType.INDIRECTLY_DEPENDS_ON_TFP_EXPR
+-
+ def output_tfp_to_file(t : TaintedFunctionPointer, proj, path):
+     Path(path).mkdir(parents=True, exist_ok=True)
+     o = open(f"{path}/tfp_{t.name}_{hex(t.pc)}_{t.uuid}.asm", "a+")
+     o.write(f"--------------------- TFP ----------------------\n")
+-    o.write(print_annotated_assembly(proj, t.bbls, t.branches, t.expr, t.pc, None, is_tfp=True, color=False))
++    o.write(print_annotated_assembly(proj, t.bbls, t.branches, t.expr, t.pc, None, 'tfp', color=False))
+     o.write(f"""
+ {'-'*48}
+ uuid: {t.uuid}
+ 
+-Reg: {t.reg}
+-Expr: {t.expr}
++Tainted Function Pointer:
++  - Reg: {t.reg}
++  - Expr: {t.expr}
++  - Control: {t.control}
++  - Register Requirements: {t.requirements.regs}
+ 
+ Constraints: {[(hex(addr),cond, str(ctype)) for addr,cond,ctype in t.constraints]}
+ Branches: {[(hex(addr), expr, outcome) for addr, expr, outcome in t.branches]}
+ 
+ """)
+ 
+-    o.write(f"CONTROLLED:\n")
++    o.write(f"Controlled Regs:\n")
+     for r in t.controlled:
+-        o.write(f"{r}: {t.registers[r].expr}\n")
+-
+-    o.write(f"\nREGS ALIASING WITH TFP:\n")
++        o.write(f"  - Reg: {r}\n")
++        o.write(f"    Expr: {t.registers[r].expr}\n")
++        o.write(f"    ControlType: {t.registers[r].control_type}\n")
++        o.write(f"    Controlled Expr: {t.registers[r].controlled_expr}\n")
++        o.write(f"    Controlled Range: {t.registers[r].controlled_range}\n")
++        o.write(f"    Controlled Range w Branches: {t.registers[r].controlled_range_with_branches}\n")
++
++    o.write(f"\nRegisters aliasing with tfp:\n")
+     for r in t.aliasing:
+-        o.write(f"{r}: {t.registers[r].expr}\n")
++        o.write(f"  - Reg: {r}\n")
++        o.write(f"    Expr: {t.registers[r].expr}\n")
++        o.write(f"    Range: {t.registers[r].range}\n")
++        o.write(f"    ControlType: {t.registers[r].control_type}\n")
+ 
+     o.write(f"\n")
+     o.write(f"Uncontrolled Regs: {t.uncontrolled}\n")
+@@ -153,3 +186,50 @@ Branches: {[(hex(addr), expr, outcome) for addr, expr, outcome in t.branches]}
+ {'-'*48}
+ """)
+     o.close()
++
++def output_secret_dependent_branch_to_file(sdb : SecretDependentBranch, proj, path):
++    Path(path).mkdir(parents=True, exist_ok=True)
++    o = open(f"{path}/sdb_{sdb.name}_{hex(sdb.pc)}_{sdb.uuid}.asm", "a+")
++    o.write(f"------------ SECRET DEPENDENT BRANCH ------------\n")
++    o.write(print_annotated_assembly(proj, sdb.bbls, sdb.branches, sdb.sdb_expr, sdb.pc, sdb.secret_load_pc, 'secret_dependent_branch', color=False))
++    o.write(f"""
++{'-'*48}
++uuid: {sdb.uuid}
++transmitter: {sdb.transmitter}
++CMP operation: {sdb.cmp_operation}
++
++Secret Dependent Branch:
++  - Expr: {sdb.sdb_expr}
++Secret Address:
++  - Expr: {sdb.secret_address.expr}
++  - Range: {sdb.secret_address.range}
++Transmitted Secret:
++  - Expr: {sdb.transmitted_secret.expr}
++  - Range: {sdb.transmitted_secret.range}
++  - Spread: {sdb.inferable_bits.spread_low} - {sdb.inferable_bits.spread_high}
++  - Number of Bits Inferable: {sdb.inferable_bits.number_of_bits_inferable}
++Base:
++  - Expr: {'None' if sdb.base == None else sdb.base.expr}
++  - Range: {'None' if sdb.base == None else sdb.base.range}
++  - Independent Expr: {'None' if sdb.independent_base == None else sdb.independent_base.expr}
++  - Independent Range: {'None' if sdb.independent_base == None else sdb.independent_base.range}
++Transmission:
++  - Expr: {sdb.transmission.expr}
++  - Range: {sdb.transmission.range}
++
++CMP Value:
++  - Expr: {sdb.cmp_value.expr}
++  - Range: {sdb.cmp_value.range}
++  - Controlled Expr: {'None' if sdb.controlled_cmp_value == None else sdb.controlled_cmp_value.expr}
++  - Controlled Range: {'None' if sdb.controlled_cmp_value == None else sdb.controlled_cmp_value.range}
++
++Register Requirements:
++  - All: {sdb.all_requirements.regs}
++  - Transmission: {sdb.transmission.requirements.regs}
++  - CMP Value: {sdb.cmp_value.requirements.regs}
++
++Constraints: {[(hex(addr),cond, str(ctype)) for addr,cond,ctype in sdb.constraints]}
++Branches: {[(hex(addr), expr, outcome) for addr, expr, outcome in sdb.branches]}
++{'-'*48}
++""")
++    o.close()
+diff --git a/analyzer/scanner/annotations.py b/analyzer/scanner/annotations.py
+index 70c7296..1afb5ef 100644
+--- a/analyzer/scanner/annotations.py
++++ b/analyzer/scanner/annotations.py
+@@ -93,6 +93,16 @@ class TransmissionAnnotation(LoadAnnotation):
+     def copy(self):
+         return TransmissionAnnotation(self.read_address_ast, self.address, self.controlled)
+ 
++class AttackerLoadedAnnotation(LoadAnnotation):
++    """
++    This symbol comes from loading a attacker-controlled value (e.g, copy_from_user).
++    """
++    def __init__(self, read_address_ast, address, controlled):
++        super().__init__(read_address_ast, "AttackerLoaded", address, controlled)
++
++    def copy(self):
++        return TransmissionAnnotation(self.read_address_ast, self.address, self.controlled)
++
+ 
+ class UncontrolledLoadAnnotation(LoadAnnotation):
+     """
+@@ -171,7 +181,7 @@ def propagate_annotations(ast: claripy.BV, address):
+     can_be_controlled = False
+ 
+     for anno in get_annotations(ast):
+-        if isinstance(anno, AttackerAnnotation):
++        if isinstance(anno, AttackerAnnotation) or isinstance(anno, AttackerLoadedAnnotation):
+             is_attack = True
+             can_be_controlled = True
+         if isinstance(anno, SecretAnnotation):
+@@ -250,6 +260,6 @@ def get_dep_set(expr):
+ 
+ def is_attacker_controlled(ast):
+     for anno in get_annotations(ast):
+-        if isinstance(anno, AttackerAnnotation) | isinstance(anno, SecretAnnotation) | isinstance(anno, TransmissionAnnotation):
++        if isinstance(anno, AttackerAnnotation) | isinstance(anno, AttackerLoadedAnnotation) | isinstance(anno, SecretAnnotation) | isinstance(anno, TransmissionAnnotation):
+             return True
+     return False
+diff --git a/analyzer/scanner/function_hooks.py b/analyzer/scanner/function_hooks.py
+new file mode 100644
+index 0000000..4c53fe9
+--- /dev/null
++++ b/analyzer/scanner/function_hooks.py
+@@ -0,0 +1,339 @@
++import angr
++import claripy
++
++# from .scanner import propagate_annotations, recordSubstitution, SubstType
++from . import memory
++from ..shared.logger import *
++from ..shared.utils import *
++from .annotations import *
++
++l = get_logger("hooksMAIN")
++
++
++def get_pointer64():
++    return claripy.BVS(name=f'ptr_64',size=64, annotations=(UncontrolledAnnotation('ptr_64'),))
++
++
++def copy_from_to_user(self, dst, src, n, is_from, copy_type_str, **kwargs):
++
++    scanner = kwargs['scanner']
++
++
++    if n.symbolic:
++        bb_addrs = list(scanner.cur_state.history.bbl_addrs)
++        start_addr = bb_addrs[0] if bb_addrs else 0
++        report_error(Exception(), hex(self.state.addr), hex(start_addr), error_type=f"{copy_type_str}: Unable to handle symbolic copy length")
++        return n
++
++    copy_len = n.args[0]
++    stored = 0
++
++
++    while(stored < copy_len):
++
++        store_len = 8 if copy_len - stored > 8 else copy_len - stored
++
++        self.state.solver.add(src > 0x8, src < 0xffffffffffffffff-8)
++
++        # Step 1: Load the value from src
++        # Check if we should forward an existing value (STL) or create a new symbol.
++        alias_store, existing_stored_val = memory.get_aliasing_store(src, store_len, self.state)
++        if alias_store:
++            # Perform Store-to-Load forwarding.
++            load_val = existing_stored_val
++            annotations = get_annotations(load_val)
++            l.info(f"Forwarded ({load_val} {annotations}) from store @({alias_store.addr})")
++        else:
++            # Create a new symbol to represent the loaded value.
++            if is_from:
++                annotations = (AttackerLoadedAnnotation(src, self.state.addr, controlled=True), )
++            else:
++                annotations = get_annotations(src)
++
++            load_val = claripy.BVS(name=f'{copy_type_str}_{store_len*8}[{src}]_{scanner.cur_id}',
++                                    size=store_len*8,
++                                    annotations=annotations)
++
++            # SHould we record the substitution?
++            # Enabling fails: the return loads from the same address,
++            # thus gets load_val forwarded as return address
++            # scanner.recordSubstitution(self.state, self.state.addr, load_val, scanner.SubstType.VALUE_SUBST)
++
++        scanner.record_load(self.state, src, load_val, store_len, alias_store)
++
++        # Step 2: Store the loaded value to dst
++
++        self.state.memory.store(dst, load_val, size=store_len)
++        l.info(f"{copy_type_str}_{store_len*8}@{hex(self.state.addr)}: [{dst}] = {load_val} (annotations={annotations})")
++
++        stored += store_len
++        src += store_len
++        dst += store_len
++
++    return n
++
++
++class copy_from_user(angr.SimProcedure):
++
++
++    def run(self, dst, src, n, **kwargs):
++        return copy_from_to_user(self, dst, src, n, True, 'COPY_FROM_USER', **kwargs)
++
++class copy_to_user(angr.SimProcedure):
++
++
++    def run(self, dst, src, n, **kwargs):
++        return copy_from_to_user(self, dst, src, n, False, 'COPY_TO_USER', **kwargs)
++
++
++class strncpy_from_user(angr.SimProcedure):
++
++
++    def run(self, dst, src, n, **kwargs):
++
++        if not n.symbolic and n.args[0] > 256:
++            n = claripy.BVV(256, 64)
++
++        return copy_from_to_user(self, dst, src, n, True, 'STRNCPY_FROM_USER', **kwargs)
++
++class strndup_user(angr.SimProcedure):
++
++
++    def run(self, src, n, **kwargs):
++
++        if not n.symbolic and n.args[0] > 256:
++            n = claripy.BVV(256, 64)
++
++        dst = get_pointer64()
++
++        return copy_from_to_user(self, dst, src, n, True, 'STRNDUP_USER', **kwargs)
++
++def get_user(self, copy_len, **kwargs):
++        # rax = src address
++        # rdx = dst
++
++        src = self.state.regs.rax
++        scanner = kwargs['scanner']
++
++        self.state.solver.add(src > 0x8, src < 0xffffffffffffffff-8)
++
++        alias_store, existing_stored_val = memory.get_aliasing_store(src, copy_len, self.state)
++        if alias_store:
++            # Perform Store-to-Load forwarding.
++            load_val = existing_stored_val
++            annotations = get_annotations(load_val)
++            l.info(f"Forwarded ({load_val} {annotations}) from store @({alias_store.addr})")
++        else:
++            # Create a new symbol to represent the loaded value.
++            annotations = (AttackerLoadedAnnotation(src, self.state.addr, controlled=True), )
++            load_val = claripy.BVS(name=f'GET_USER_{copy_len*8}[{src}]_{scanner.cur_id}',
++                                    size=copy_len*8,
++                                    annotations=annotations)
++
++        scanner.record_load(self.state, src, load_val, copy_len, alias_store)
++
++        self.state.regs.rdx = load_val.zero_extend((8 - copy_len) * 8)
++
++        l.info(f"GET_USER_{copy_len*8}@{hex(self.state.addr)}: {load_val} (annotations={annotations})")
++
++        return 0
++
++class get_user_1(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return get_user(self, 1, **kwargs)
++
++class get_user_2(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return get_user(self, 2, **kwargs)
++
++class get_user_4(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return get_user(self, 4, **kwargs)
++
++class get_user_8(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return get_user(self, 8, **kwargs)
++
++
++
++def put_user(self, store_len, **kwargs):
++    # eax = to_store
++    # rcx = dst address
++
++    dst = self.state.regs.rcx
++    to_store = claripy.Extract(store_len * 8 - 1, 0, self.state.regs.rax)
++
++    self.state.memory.store(dst, to_store, size=store_len)
++    l.info(f"PUT_USER{store_len*8}@{hex(self.state.addr)}")
++    # l.info(f"PUT_USER{store_len*8}@{hex(self.state.addr)}: [{dst}] = {to_store} (annotations={get_annotations(to_store)})")
++
++    self.state.regs.rcx = 0
++
++    return self.state.regs.rax
++
++class put_user_1(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return put_user(self, 1, **kwargs)
++
++class put_user_2(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return put_user(self, 2, **kwargs)
++
++class put_user_4(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return put_user(self, 4, **kwargs)
++
++class put_user_8(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return put_user(self, 8, **kwargs)
++
++class return_pointer64(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return get_pointer64()
++
++class pass_function(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        return 0
++
++class return_zero(angr.SimProcedure):
++
++    def run(self, **kwargs):
++        # These functions have to return 0 for success
++        return 0
++
++
++def do_pass(state):
++    l.info(f"Ignored instruction at {hex(state.addr)})")
++    return
++
++
++functions_hooks = {
++    '_copy_from_user' : copy_from_user,
++    '_copy_to_user' : copy_to_user,
++    'copy_from_user_nofault' : copy_from_user,
++    'copy_to_user_nofault' : copy_to_user,
++    '__get_user_1' : get_user_1,
++    '__get_user_4' : get_user_4,
++    '__get_user_2' : get_user_2,
++    '__get_user_8' : get_user_8,
++    '__put_user_1' : put_user_1,
++    '__put_user_2' : put_user_2,
++    '__put_user_4' : put_user_4,
++    '__put_user_8' : put_user_8,
++
++    'strncpy_from_user' : strncpy_from_user,
++    'strndup_user' : strndup_user,
++
++    # alloc functions
++    '__kmalloc' : return_pointer64,
++    'kmalloc_trace' : return_pointer64,
++    '__kmalloc_node_track_caller' : return_pointer64,
++    '__kmalloc_node' : return_pointer64,
++    'kmem_cache_alloc' : return_pointer64,
++    'kmem_cache_alloc_lru' : return_pointer64,
++    'kmem_cache_alloc_node' : return_pointer64,
++    'kvmalloc_node' : return_pointer64,
++    'kfree' : pass_function,
++    'kfree_sensitive' : pass_function,
++    'kmem_cache_free' : pass_function,
++
++    # locks
++    '__rcu_read_lock' : pass_function,
++    '__rcu_read_unlock' : pass_function,
++
++    '_raw_read_lock' : pass_function,
++    '_raw_read_lock_bh' : pass_function,
++    '_raw_read_lock_irq' : pass_function,
++    '_raw_read_lock_irqsave' : pass_function,
++
++    '_raw_read_unlock' : pass_function,
++    '_raw_read_unlock_bh' : pass_function,
++    '_raw_read_unlock_irq' : pass_function,
++    '_raw_read_unlock_irqrestore' : pass_function,
++
++    '_raw_write_lock' : pass_function,
++    '_raw_write_lock_bh' : pass_function,
++    '_raw_write_lock_irq' : pass_function,
++    '_raw_write_lock_irqsave' : pass_function,
++    '_raw_write_lock_nested' : pass_function,
++
++    '_raw_write_unlock' : pass_function,
++    '_raw_write_unlock_bh' : pass_function,
++    '_raw_write_unlock_irq' : pass_function,
++    '_raw_write_unlock_irqrestore' : pass_function,
++
++    '_raw_spin_lock' : pass_function,
++    '_raw_spin_lock_bh' : pass_function,
++    '_raw_spin_lock_irq' : pass_function,
++    '_raw_spin_lock_irqsave' : pass_function,
++
++    '_raw_spin_unlock' : pass_function,
++    '_raw_spin_unlock_bh' : pass_function,
++    '_raw_spin_unlock_irq' : pass_function,
++    '_raw_spin_unlock_irqrestore' : pass_function,
++
++    'down_write_killable' : return_zero,
++
++    'mutex_lock' : pass_function,
++    'mutex_lock_interruptible' : pass_function,
++    'mutex_lock_io' : pass_function,
++    'mutex_lock_killable' : pass_function,
++    'mutex_unlock' : pass_function,
++
++    # scheduling
++    '__cond_resched' : pass_function,
++    '__schedule' : pass_function,
++    'schedule' : pass_function,
++
++    # delayed work
++    'fput' : pass_function,
++    '__queue_work' : pass_function,
++    'queue_work_node' : pass_function,
++    'queue_work_on' : pass_function,
++    'queue_delayed_work_on' : pass_function,
++    'call_rcu' : pass_function,
++    '__wake_up' : pass_function,
++    '__wake_up_common_lock' : pass_function,
++
++    # Too radical? Unknown
++    # 'call_rcu' : pass_function
++
++}
++
++common_functions = ['strcmp']
++
++
++
++def initialize_hooks(scanner, proj: angr.Project, instructions_to_ignore):
++
++    hooked_addresses = []
++
++    for name, hook in functions_hooks.items():
++        symbol = proj.loader.find_symbol(name)
++        if symbol:
++            l.info(f"Hooking '{name}' symbols {symbol}")
++            hooked_addresses.append(symbol.rebased_addr)
++        proj.hook_symbol(name, hook(scanner=scanner))
++
++    for address, length in instructions_to_ignore:
++        proj.hook(addr=address, hook=do_pass, length=length)
++
++    # Would be better to implement hooks for these functions, but for now
++    # we just ignore they are not skipped if they are visited many times. Since
++    # these functions are used a lot at different places
++    for name in common_functions:
++        symbol = proj.loader.find_symbol(name)
++        if symbol:
++            hooked_addresses.append(symbol.rebased_addr)
++
++    return set(hooked_addresses)
+diff --git a/analyzer/scanner/scanner.py b/analyzer/scanner/scanner.py
+index 2093b53..ca19481 100644
+--- a/analyzer/scanner/scanner.py
++++ b/analyzer/scanner/scanner.py
+@@ -16,19 +16,23 @@ from .annotations import *
+ import sys
+ from enum import Enum
+ import traceback
++import time
+ 
+ from angr.concretization_strategies import SimConcretizationStrategy
+ 
+ # autopep8: off
++from .function_hooks import initialize_hooks
+ from ..analysis.pipeline import AnalysisPipeline
+ from ..shared.logger import *
+ from ..shared.transmission import *
+ from ..shared.taintedFunctionPointer import *
++from ..shared.secretDependentBranch import *
+ from ..shared.config import *
+ from ..shared.astTransform import *
+ # autopep8: on
+ 
+-l = get_logger("Scanner")
++l = get_logger("ScannerMAIN")
++l_verbose = get_logger("Scanner")
+ 
+ n_concrete_addr = 0
+ class DummyConcretizationStrategy(SimConcretizationStrategy):
+@@ -84,26 +88,40 @@ class SplitException(Exception):
+     "Splitted state, skipping"
+     pass
+ 
++global_timing0 = []
++global_timing1 = []
++
+ class Scanner:
+     """
+     Performs the symbolic execution, keeping track of state splitting and
+     all the loads/stores that were encountered.
+     """
+ 
++    name : str
+     transmissions: list[TransmissionExpr]
++    calls: list[TaintedFunctionPointer]
++    secretDependentBranches: list[SecretDependentBranchExpr]
+     loads: list[memory.MemOp]
+     stores: list[memory.MemOp]
++    hooked_addresses : set[int]
++
++    pc_total_target_insertions : dict
+ 
+     cur_id: int
+     n_alias: int
+ 
+     analysis_pipeline : AnalysisPipeline
++    indirect_branch_targets : dict[int,list[int]]
+ 
+-    def __init__(self, analysis_pipeline):
++    def __init__(self, name, analysis_pipeline, indirect_branch_targets):
++        self.name = name
+         self.analysis_pipeline = analysis_pipeline
++        self.indirect_branch_targets = indirect_branch_targets
+ 
+         self.transmissions = []
++        self.secretDependentBranches = []
+         self.calls = []
++        self.pc_total_target_insertions = {}
+ 
+         self.loads = []
+         self.stores = []
+@@ -114,6 +132,7 @@ class Scanner:
+ 
+         self.states = []
+         self.bbs = {}
++        self.hooked_addresses = set()
+         self.cur_state = None
+ 
+ 
+@@ -124,16 +143,21 @@ class Scanner:
+         state.regs.rbp = claripy.BVS('rbp', 64, annotations=(UncontrolledAnnotation('rbp'),))
+         state.regs.rsp = claripy.BVS('rsp', 64, annotations=(UncontrolledAnnotation('rsp'),))
+         state.regs.gs = claripy.BVS('gs', 64, annotations=(UncontrolledAnnotation('gs'),))
++        state.solver.add(state.regs.rsp > 0xffffc90000000000)
++        state.solver.add(state.regs.rsp < 0xffffe8ffffffffff)
++        state.solver.add(state.regs.rbp > 0xffffc90000000000)
++        state.solver.add(state.regs.rbp < 0xffffe8ffffffffff)
+ 
+         # Attacker-controlled registers.
+-        for reg in global_config['controlled_registers']:
+-            try:
+-                length = getattr(state.regs, reg).length
+-            except AttributeError:
+-                l.critical(f"Invalid register in config! {reg}")
++        if 'controlled_registers' in global_config:
++            for reg in global_config['controlled_registers']:
++                try:
++                    length = getattr(state.regs, reg).length
++                except AttributeError:
++                    l_verbose.critical(f"Invalid register in config! {reg}")
+ 
+-            bvs = claripy.BVS(reg, length, annotations=(AttackerAnnotation(reg),))
+-            setattr(state.regs, reg, bvs)
++                bvs = claripy.BVS(reg, length, annotations=(AttackerAnnotation(reg),))
++                setattr(state.regs, reg, bvs)
+ 
+         # Attacker-controlled stack locations: save them as stores.
+         # TODO: this is a hack. If STL forwarding is disabled, stack variables
+@@ -158,6 +182,50 @@ class Scanner:
+                     self.cur_id += 1
+                     self.stores.append(cur_store)
+ 
++        if global_config['InitializeControlledPTRegs']:
++            # https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/ptrace.h#L44
++            pt_regs = ["r15", "r14", "r13", "r12", "rbp", "rbx",
++                       "eflags",        # r11 = eflags
++                       "r10", "r9", "r8", "rax",
++                       "rcx",           # rcx = next instruction after syscall, we assume its controllable
++                       "rdx", "rsi", "rdi",
++                       "rax",
++                       "rcx",           # rcx again
++                       "uncontrolled_cs",  # cs
++                       "eflags"         # eflags
++                       "user_rsp"       # user rsp
++                       "uncontrolled_ss",  # ss
++                       ]
++            name = "pt_regs"
++            length = getattr(state.regs, "rdi").length
++            bvs = claripy.BVS(name, length, annotations=(UncontrolledAnnotation(name),))
++            setattr(state.regs, "rdi", bvs)
++
++            for reg, offset in zip(pt_regs, range(0, len(pt_regs) * 8, 8)):
++
++                length = 64
++
++                if "uncontrolled" in reg:
++                    bvs = claripy.BVS(reg, length, annotations=(UncontrolledAnnotation(reg),))
++                else:
++                    bvs = claripy.BVS(reg, length, annotations=(AttackerAnnotation(reg),))
++
++                addr = state.regs.rdi + (offset)
++
++                cur_store = memory.MemOp(pc=state.addr,
++                        addr=addr,
++                        val=bvs,
++                        size=length/8,
++                        id=self.cur_id,
++                        op_type=memory.MemOpType.STORE)
++                state.globals[self.cur_id] = cur_store
++                self.cur_id += 1
++                self.stores.append(cur_store)
++
++
++
++
++
+     def block_contains_speculation_stop(self, bb : angr.block.Block):
+         for instruction in bb.capstone.insns:
+             if instruction.mnemonic in global_config["SpeculationStopMnemonics"]:
+@@ -188,6 +256,28 @@ class Scanner:
+                 break
+         return n_instr
+ 
++    def count_control_flow_changes(self, state):
++        # Count the number of control flow changes
++        # - All TAKEN Direct/Indirect Calls/Jumps
++        # - Returns
++        n_control_flow_changes = 0
++
++        for bbl_addr, jump_kind, jump_target in zip(self.get_bbls(state)[:-1], list(state.history.jumpkinds)[1:], state.history.jump_targets):
++            if jump_kind == 'Ijk_Ret':
++                n_control_flow_changes += 1
++
++            elif jump_kind == 'Ijk_Call':
++                n_control_flow_changes += 1
++
++            elif jump_kind == 'Ijk_Boring':
++
++                if len(self.bbs[bbl_addr]['block'].vex.constant_jump_targets_and_jumpkinds.keys()) > 1:
++                    # conditional jump, only count if we took non-default target
++                    if self.bbs[bbl_addr]['block'].vex.default_exit_target != jump_target.args[0]:
++                        n_control_flow_changes += 1
++
++        return n_control_flow_changes
++
+     def get_aliases(self, state):
+         aliases = []
+         for v in state.globals.keys():
+@@ -232,6 +322,9 @@ class Scanner:
+         Loads and Stores that have at least a symbol marked as secret
+         in their expression are saved as potential transmissions.
+         """
++        if not global_config['TransmissionGadgets']:
++            return
++
+         if contains_secret(expr):
+             # Create a new transmission object.
+             t = TransmissionExpr(pc=state.scratch.ins_addr,
+@@ -242,7 +335,9 @@ class Scanner:
+                                                        aliases=self.get_aliases(state),
+                                                        constraints=self.get_constraints(state),
+                                                        n_instr=self.count_instructions(state, state.scratch.ins_addr),
+-                                                       contains_spec_stop=self.history_contains_speculation_stop(state)
++                                                       n_control_flow_changes=self.count_control_flow_changes(state),
++                                                       contains_spec_stop=self.history_contains_speculation_stop(state),
++                                                       approximated_indirect_branch_path='approximated_indirect_branch_path' in state.globals
+                                                        )
+             self.transmissions.append(t)
+ 
+@@ -256,7 +351,11 @@ class Scanner:
+         Indirect calls that are attacker-controlled are saved
+         as tainted function pointers (a.k.a Dispatch Gadgets).
+         """
+-        l.warning(f"Found new TFP! {func_ptr_ast} {get_annotations(func_ptr_ast)}")
++        if not global_config['TaintedFunctionPointers']:
++            return
++
++        l_verbose.warning(f"Found new TFP! {func_ptr_ast} {get_annotations(func_ptr_ast)}")
++
+         # Create a new TFP object.
+         tfp = TaintedFunctionPointer(pc=state.scratch.ins_addr,
+                                         expr=func_ptr_ast,
+@@ -266,19 +365,100 @@ class Scanner:
+                                         aliases=self.get_aliases(state),
+                                         constraints=self.get_constraints(state),
+                                         n_instr=self.count_instructions(state, state.scratch.ins_addr),
++                                        n_control_flow_changes=self.count_control_flow_changes(state),
+                                         contains_spec_stop=self.history_contains_speculation_stop(state),
+-                                        n_dependent_loads=get_load_depth(func_ptr_ast)
++                                        n_dependent_loads=get_load_depth(func_ptr_ast),
++                                        approximated_indirect_branch_path='approximated_indirect_branch_path' in state.globals
+                                         )
+ 
+         for reg in get_x86_registers():
+             reg_ast = getattr(state.regs, reg)
+             tfp.registers[reg] = TFPRegister(reg, reg_ast)
+ 
++
++        if global_config['TaintedFunctionPointersRegisterDereference']:
++            # t0 = time.time()
++            # Check if there is a register at dereference
++            for reg in get_x86_registers():
++                reg_expr = tfp.registers[reg].expr
++                # For now we assume all TFPs are calls (not jumps)
++                # add 8 to rsp due return value added to stack
++                call_offset = 8 if reg == 'rsp' else 0
++
++                for offset in range(-0x40, 0xa0, 8):
++                    reg_str = f'{reg}_{offset + call_offset}'
++
++                    alias_store, stored_val = memory.get_aliasing_store(reg_expr + offset + call_offset, 8, state)
++
++                    if alias_store and is_attacker_controlled(stored_val) and 'gs' not in str(stored_val):
++                        tfp.registers[reg_str] = TFPRegister(reg_str, stored_val, is_dereferenced=True)
++                        tfp.registers[reg].reg_dereferenced.append(tfp.registers[reg_str])
++
++            # global_timing0.append(time.time() - t0)
++            # print(f"Register dereference setup took: {global_timing0[-1]} (AVG: {sum(global_timing0) / len(global_timing0)})")
++
+         self.calls.append(tfp)
+ 
+         if global_config['AnalyzeDuringScanning']:
++            t0 = time.time()
++
+             self.analysis_pipeline.analyze_tainted_function_pointer(tfp)
+ 
++            global_timing1.append(time.time() - t0)
++            print(f"TFP Analysis took:: {global_timing1[-1]} (AVG: {sum(global_timing1) / len(global_timing1)})")
++
++
++    def check_secret_dependent_branch(self, expr, state):
++        """
++        Branches that have at least a symbol marked as secret in their
++        branch condition expression (guard) are saved as potential
++        secret dependent branches.
++        """
++        if not global_config['SecretDependentBranches']:
++            return
++
++        if contains_secret(expr):
++
++            pc = state.scratch.ins_addr
++            bbls = self.get_bbls(state)
++            constraints=self.get_constraints(state)
++
++
++            # Filter out for duplicates: angr triggers the exit_hook twice
++            # for each conditional branch (e.g., for both == and != cases),
++            # we only capture one case
++            if self.secretDependentBranches \
++                and pc == self.secretDependentBranches[-1].pc \
++                and bbls == self.secretDependentBranches[-1].bbls \
++                and len(constraints) == len(self.secretDependentBranches[-1].constraints):
++
++                # Check if the constraints are equal (We compare the PC +
++                # AST cache key of each constraint)
++                if all(constraints[i][0] == self.secretDependentBranches[-1].constraints[i][0] and
++                        constraints[i][1].cache_key == self.secretDependentBranches[-1].constraints[i][1].cache_key
++                        for i in range(len(constraints))):
++                    # duplicate, thus return
++                    return
++
++
++            # Create a new secret dependent branch object.
++            sdb = SecretDependentBranchExpr(pc=pc,
++                        expr=expr,
++                        transmitter=TransmitterType.SECRET_DEP_BRANCH,
++                        bbls=bbls,
++                        branches=self.get_history(state),
++                        aliases=self.get_aliases(state),
++                        constraints=constraints,
++                        n_instr=self.count_instructions(state, state.scratch.ins_addr),
++                        n_control_flow_changes=self.count_control_flow_changes(state),
++                        contains_spec_stop=self.history_contains_speculation_stop(state),
++                        approximated_indirect_branch_path='approximated_indirect_branch_path' in state.globals
++                        )
++
++            self.secretDependentBranches.append(sdb)
++
++            if global_config['AnalyzeDuringScanning']:
++                self.analysis_pipeline.analyze_secret_dependent_branch(sdb)
+ 
+ 
+     #---------------- STATE SPLITTING ----------------------------
+@@ -317,7 +497,7 @@ class Scanner:
+ 
+             # TODO: Satisfiability check can be expensive, can we do better with ast substitutions?
+             if s.solver.satisfiable():
+-                l.info(f"Added state @{hex(s.addr)}  with condition {[(hex(addr), cond, str(ctype)) for addr, cond, ctype in a.conditions]}")
++                l_verbose.info(f"Added state @{hex(s.addr)}  with condition {[(hex(addr), cond, str(ctype)) for addr, cond, ctype in a.conditions]}")
+                 self.states.append(s)
+ 
+ 
+@@ -330,16 +510,16 @@ class Scanner:
+         is used in a Load/Store/Branch instructions.
+         """
+         if state.inspect.expr_result.op == "Concat":
+-            l.info(f"Expr Hook (Concat) @{hex(state.scratch.ins_addr)} :")
+-            l.info(f"   Before:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
++            l_verbose.info(f"Expr Hook (Concat) @{hex(state.scratch.ins_addr)} :")
++            l_verbose.info(f"   Before:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
+             state.inspect.expr_result = match_sign_ext(state.inspect.expr_result, state.scratch.ins_addr)
+-            l.info(f"   After:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
++            l_verbose.info(f"   After:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
+ 
+         elif state.inspect.expr_result.op == "SignExt":
+-            l.info(f"Expr Hook (SignExt) @{hex(state.scratch.ins_addr)} :")
+-            l.info(f"   Before:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
++            l_verbose.info(f"Expr Hook (SignExt) @{hex(state.scratch.ins_addr)} :")
++            l_verbose.info(f"   Before:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
+             state.inspect.expr_result = sign_ext_to_sum(state.inspect.expr_result, state.scratch.ins_addr)
+-            l.info(f"   After:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
++            l_verbose.info(f"   After:  {state.inspect.expr_result}  {get_annotations(state.inspect.expr_result)}")
+ 
+         elif state.inspect.expr_result.op == "If":
+             # We assume any expression that is directly translated as an if-then-else statement is
+@@ -358,6 +538,34 @@ class Scanner:
+             state.solver.add(state.inspect.mem_read_address > 0x8,
+                              state.inspect.mem_read_address < 0xffffffffffffffff-8)
+ 
++
++    def record_load(self, state: angr.SimState, load_addr, load_val, load_len, alias_store):
++
++        # Check for aliasing loads.
++        cur_load = memory.MemOp(pc=state.scratch.ins_addr,
++                                addr=load_addr,
++                                val=load_val,
++                                size=load_len,
++                                id=self.cur_id,
++                                op_type=memory.MemOpType.LOAD)
++
++        aliases = memory.get_aliasing_loads(cur_load, state, alias_store)
++        for alias in aliases:
++            state.globals[f"alias_{self.n_alias}"] = alias
++            self.n_alias += 1
++            # Add a symbolic constraint to the angr state.
++            state.solver.add(alias.to_BV())
++            l_verbose.warning(f"Adding alias {alias.to_BV()}")
++
++            if not state.solver.satisfiable():
++                report_error(Exception(), hex(state.scratch.ins_addr), hex(0), error_type="ALIAS UNSAT")
++
++        # Save this load in the angr state.
++        state.globals[self.cur_id] = cur_load
++        self.cur_id += 1
++        self.loads.append(cur_load)
++
++
+     def load_hook_after(self, state: angr.SimState):
+         """
+         Create a new symbolic variable for every load, and annotate it with
+@@ -365,32 +573,33 @@ class Scanner:
+         """
+         load_addr = state.inspect.mem_read_address
+         load_len = state.inspect.mem_read_length
+-        l.info(f"Load@{hex(state.addr)}: {load_addr}  {get_annotations(load_addr)}")
+-        l.info(state.solver.constraints)
++        # print(f"Load@{hex(state.scratch.ins_addr)}: {load_addr}  {get_annotations(load_addr)}")
++        l_verbose.info(f"Load@{hex(state.scratch.ins_addr)}: {load_addr}  {get_annotations(load_addr)}")
++        l_verbose.info(state.solver.constraints)
+ 
+         # If the state has been manually splitted after this load, we already
+         # have a value for this load: just use that.
+-        subst = getSubstitution(state, state.addr,SubstType.VALUE_SUBST)
++        subst = getSubstitution(state, state.scratch.ins_addr, SubstType.VALUE_SUBST)
+         if subst != None:
+             state.inspect.mem_read_expr = subst
+             return
+ 
+         # If the state has been manually splitted _on_ this load, use
+         # the substitution recorded for the address.
+-        subst = getSubstitution(state, state.addr, SubstType.ADDR_SUBST)
++        subst = getSubstitution(state, state.scratch.ins_addr, SubstType.ADDR_SUBST)
+         if subst != None:
+             load_addr = subst
+-            l.info(f" Applied substitution! {load_addr}  {get_annotations(load_addr)}")
++            l_verbose.info(f" Applied substitution! {load_addr}  {get_annotations(load_addr)}")
+         else:
+             # If the state has _not_ been manually splitted, check if we
+             # should split it.
+-            asts = split_conditions(load_addr, simplify=False, addr=state.addr)
++            asts = split_conditions(load_addr, simplify=False, addr=state.scratch.ins_addr)
+             assert(len(asts) >= 1)
+ 
+-            l.info(f"  After transformations: {load_addr}")
++            l_verbose.info(f"  After transformations: {load_addr}")
+ 
+             if len(asts) > 1:
+-                self.split_state(state, asts, state.addr)
++                self.split_state(state, asts, state.scratch.ins_addr)
+                 raise SplitException
+ 
+         # Check if we should forward an existing value (STL) or create a new symbol.
+@@ -398,43 +607,22 @@ class Scanner:
+         if alias_store:
+             # Perform Store-to-Load forwarding.
+             load_val = stored_val
+-            l.info(f"Forwarded ({load_val} {get_annotations(load_val)}) from store @({alias_store.addr})")
++            l_verbose.info(f"Forwarded ({load_val} {get_annotations(load_val)}) from store @({alias_store.addr})")
+         else:
+             # Create a new symbol to represent the loaded value.
+-            annotation = propagate_annotations(load_addr, state.addr)
++            annotation = propagate_annotations(load_addr, state.scratch.ins_addr)
+             load_val = claripy.BVS(name=f'LOAD_{load_len*8}[{load_addr}]_{self.cur_id}',
+                                     size=load_len*8,
+                                     annotations=(annotation,))
+ 
+             # Save it, in case we later need to split this state manually.
+-            recordSubstitution(self.cur_state, state.addr, load_val, SubstType.VALUE_SUBST)
++            recordSubstitution(self.cur_state, state.scratch.ins_addr, load_val, SubstType.VALUE_SUBST)
+ 
+         # Overwrite loaded val.
+         state.inspect.mem_read_expr = load_val
+ 
+-        # Check for aliasing loads.
+-        cur_load = memory.MemOp(pc=state.addr,
+-                                addr=load_addr,
+-                                val=load_val,
+-                                size=load_len,
+-                                id=self.cur_id,
+-                                op_type=memory.MemOpType.LOAD)
+-        self.cur_id += 1
+-
+-        aliases = memory.get_aliasing_loads(cur_load, state, alias_store)
+-        for alias in aliases:
+-            state.globals[f"alias_{self.n_alias}"] = alias
+-            self.n_alias += 1
+-            # Add a symbolic constraint to the angr state.
+-            state.solver.add(alias.to_BV())
+-            l.warning(f"Adding alias {alias.to_BV()}")
+-            if not state.solver.satisfiable():
+-                report_error(Exception(), hex(self.cur_state.addr), hex(0), error_type="ALIAS UNSAT")
+-
+-
+-        # Save this load in the angr state.
+-        state.globals[self.cur_id] = cur_load
+-        self.loads.append(cur_load)
++        # Save the load
++        self.record_load(state, load_addr, load_val, load_len, alias_store)
+ 
+         # Is this load a transmission?
+         self.check_transmission(load_addr, TransmitterType.LOAD, state)
+@@ -451,35 +639,39 @@ class Scanner:
+             return
+ 
+         store_addr = state.inspect.mem_write_address
+-        store_len = state.inspect.mem_write_length
+         stored_value = state.inspect.mem_write_expr
+-        l.error(f"Store@{hex(state.addr)}: [{store_addr}] = {stored_value}")
+-        l.info(state.solver.constraints)
++        store_len = state.inspect.mem_write_length
++        # In some rare cases Angr does not initialize sore_len
++        if store_len == None:
++            store_len = int(state.inspect.mem_write_expr.size() / 8)
++
++
++        l_verbose.error(f"Store@{hex(state.scratch.ins_addr)}: [{store_addr}] = {stored_value}")
++        l_verbose.info(state.solver.constraints)
+ 
+         # Don't execute the store architecturally.
+         state.inspect.mem_write_length = 0
+ 
+         # Check if there is a substitution to be made for this address.
+         # This can happen if the state comes from a manual splitting.
+-        is_subst = False
+-        subst = getSubstitution(state, state.addr, SubstType.ADDR_SUBST)
++        subst = getSubstitution(state, state.scratch.ins_addr, SubstType.ADDR_SUBST)
+         if subst != None:
+             store_addr = subst
+         else:
+             # Check if the address contains an if-then-else node.
+-            addr_asts = split_conditions(store_addr, simplify=False, addr=state.addr)
+-            # value_asts = split_conditions(stored_value, simplify=False, addr=state.addr)
++            addr_asts = split_conditions(store_addr, simplify=False, addr=state.scratch.ins_addr)
++            # value_asts = split_conditions(stored_value, simplify=False, addr=state.scratch.ins_addr)
+ 
+-            l.error(f" After ast transformation: [{store_addr}] = {stored_value}")
++            l_verbose.error(f" After ast transformation: [{store_addr}] = {stored_value}")
+             if len(addr_asts) > 1:
+-                self.split_state(state, addr_asts, state.addr)
++                self.split_state(state, addr_asts, state.scratch.ins_addr)
+                 raise SplitException
+ 
+-        l.error(f"After substitution: Store@{hex(state.addr)}: [{store_addr}] = {stored_value}")
++        l_verbose.error(f"After substitution: Store@{hex(state.scratch.ins_addr)}: [{store_addr}] = {stored_value}")
+ 
+         # Save this store in the angr state, so that future loads can check for
+         # aliasing.
+-        cur_store = memory.MemOp(pc=state.addr,
++        cur_store = memory.MemOp(pc=state.scratch.ins_addr,
+                                 addr=store_addr,
+                                 val=stored_value,
+                                 size=store_len,
+@@ -498,7 +690,9 @@ class Scanner:
+         """
+         Hook on indirect calls, for Tainted Function Pointers.
+         """
+-        l.warning(f"Exit hook @{hex(state.scratch.ins_addr)}")
++        # print("Exit Target Before", state.inspect.exit_target)
++
++        l_verbose.warning(f"Exit hook @{hex(state.scratch.ins_addr)}")
+         func_ptr_ast = state.inspect.exit_target
+ 
+         if not isinstance(func_ptr_ast, claripy.ast.base.Base):
+@@ -506,75 +700,161 @@ class Scanner:
+             # TODO: inspect the target to see if it's an indirect call thunk?
+             return
+ 
+-        # First case: symbolic target
+-        if func_ptr_ast.symbolic:
+-            # Whenever the target is symbolic, and it is not a return, we
+-            # know we are performing an indirect call.
+-            block = state.block()
+-            if block.vex.jumpkind == 'Ijk_Ret':
+-                return
++        # ----------- TFP
++        # if state.inspect.exit_jumpkind ==  'Ijk_Ret' and state.addr not in self.hooked_addresses:
++
++
++        #     block = state.block()
++        #     if block.vex.jumpkind != 'Ijk_Ret':
++        #         return
++
++        #     func_ptr_reg = 'rsp'
+ 
+-            # get the register
+-            instruction = block.capstone.insns[-1].insn
++        #     if not func_ptr_ast.symbolic:
++        #         exit_target = state.inspect.exit_target.args[0]
++        #         print(f"return_target, {self.name}, {hex(exit_target)}")
+ 
+-            if 'ptr' in instruction.op_str:
+-                # Jump to pointer in memory (e.g, jmp qword ptr [rax])
+-                func_ptr_reg = 'mem'
++        if func_ptr_ast.symbolic or state.inspect.exit_target.args[0] in self.thunk_list:
++
++            # First case: symbolic target
++            if func_ptr_ast.symbolic:
++                # Whenever the target is symbolic, and it is not a return, we
++                # know we are performing an indirect call.
++                block = state.block()
++                if state.inspect.exit_jumpkind ==  'Ijk_Ret' or block.vex.jumpkind == 'Ijk_Ret':
++                    return
++
++                # get the register
++                instruction = block.capstone.insns[-1].insn
++
++                if 'ptr' in instruction.op_str:
++                    # Jump to pointer in memory (e.g, jmp qword ptr [rax])
++                    func_ptr_reg = 'mem'
++                else:
++                    # Jump to registers
++                    regs_read, regs_write = instruction.regs_access()
++
++                    # exclude all written registers; RSP in case of a call instruction
++                    if len(regs_read) > len(regs_write):
++                        regs_read = [x for x in regs_read if x not in regs_write]
++
++                    reg_id = regs_read[0]
++                    func_ptr_reg = instruction.reg_name(reg_id)
++
++            # Second case: jump to indirect thunk
++            else:
++                exit_target = state.inspect.exit_target.args[0]
++                func_ptr_reg = self.thunk_list[exit_target]
++                func_ptr_ast = getattr(state.regs, func_ptr_reg)
++
++            # Process first and second case: TFP
++            # Check if we need to substitute the expression (happens with manual splits).
++            subst = getSubstitution(state, state.scratch.ins_addr, SubstType.CALL_SUBST)
++            if subst != None:
++                l_verbose.warning(f"Substituting {func_ptr_ast}   with   {subst}")
++                func_ptr_ast = subst
+             else:
+-                # Jump to registers
+-                regs_read, regs_write = instruction.regs_access()
++                # Check if the symbolic address contains an if-then-else node.
++                asts = split_conditions(func_ptr_ast, simplify=False, addr=state.scratch.ins_addr)
++                assert(len(asts) >= 1)
+ 
+-                # exclude all written registers; RSP in case of a call instruction
+-                if len(regs_read) > len(regs_write):
+-                    regs_read = [x for x in regs_read if x not in regs_write]
++                l_verbose.warning(f"  Before transformations: {func_ptr_ast}")
++                l_verbose.warning(f"  After transformations: {asts}")
+ 
+-                reg_id = regs_read[0]
+-                func_ptr_reg = instruction.reg_name(reg_id)
++                if len(asts) > 1:
++                    self.split_state(state, asts, state.scratch.ins_addr, branch_split=False, subst_type=SubstType.CALL_SUBST)
++                    raise SplitException
+ 
+-        # Second case: jump to indirect thunk
+-        elif state.inspect.exit_target.args[0] in self.thunk_list:
+-            exit_target = state.inspect.exit_target.args[0]
+-            func_ptr_reg = self.thunk_list[exit_target]
+-            func_ptr_ast = getattr(state.regs, func_ptr_reg)
++            # process the TFP
++            self.check_tfp(state, func_ptr_reg, func_ptr_ast)
++            # check if it is also a transmission
++            self.check_transmission(func_ptr_ast, TransmitterType.CODE_LOAD, state)
++
++
++            if func_ptr_ast.symbolic and state.scratch.ins_addr in self.indirect_branch_targets:
++                # Prevent looping
++                if state.scratch.ins_addr in state.history.jump_sources:
++                    # Stop exploration here
++                    raise SplitException
++
++                # Limit states
++                self.pc_total_target_insertions.setdefault(state.scratch.ins_addr, 0)
++                self.pc_total_target_insertions[state.scratch.ins_addr] += 1
++
++                if self.pc_total_target_insertions[state.scratch.ins_addr] > 5:
++                    # Stop exploration here, we inserted enough times the targets
++                    raise SplitException
++
++                print(">>>> Inserting targets at PC", hex(state.scratch.ins_addr))
++                constraints = [target == func_ptr_ast for target in self.indirect_branch_targets[state.scratch.ins_addr]]
++                state.solver.add(claripy.Or(*constraints))
++                state.globals[f"approximated_indirect_branch_path"] = True
+ 
+-        else:
+             return
+ 
+-        # Check if we need to substitute the expression (happens with manual splits).
+-        subst = getSubstitution(state, state.scratch.ins_addr, SubstType.CALL_SUBST)
+-        if subst != None:
+-            l.warning(f"Substituting {func_ptr_ast}   with   {subst}")
+-            func_ptr_ast = subst
+-        else:
+-            # Check if the symbolic address contains an if-then-else node.
+-            asts = split_conditions(func_ptr_ast, simplify=False, addr=state.scratch.ins_addr)
+-            assert(len(asts) >= 1)
+ 
+-            l.warning(f"  Before transformations: {func_ptr_ast}")
+-            l.warning(f"  After transformations: {asts}")
++        # ----------- Secret dependent branches (conditional jumps)
++        elif type(state.inspect.exit_guard.args[0]) != bool:
++            exit_guard = state.inspect.exit_guard
+ 
+-            if len(asts) > 1:
+-                self.split_state(state, asts, state.scratch.ins_addr, branch_split=False, subst_type=SubstType.CALL_SUBST)
+-                raise SplitException
++            # Check if we need to substitute the expression (happens with manual splits).
++            subst = getSubstitution(state, state.scratch.ins_addr, SubstType.CALL_SUBST)
++            if subst != None:
++                l_verbose.warning(f"Substituting {exit_guard}   with   {subst}")
++                exit_guard = subst
++            else:
++                # Check if the address contains an if-then-else node.
++                asts = split_conditions(exit_guard, simplify=False, addr=state.scratch.ins_addr)
++                assert(len(asts) >= 1)
++
++                l_verbose.warning(f"  Before transformations: {exit_guard}")
++                l_verbose.warning(f"  After transformations: {asts}")
++
++                if len(asts) > 1:
++                    self.split_state(state, asts, state.scratch.ins_addr, branch_split=False, subst_type=SubstType.CALL_SUBST)
++                    raise SplitException
+ 
+-        # process the TFP
+-        self.check_tfp(state, func_ptr_reg, func_ptr_ast)
+-        # check if it is also a transmission
+-        self.check_transmission(func_ptr_ast, TransmitterType.CODE_LOAD, state)
++            self.check_secret_dependent_branch(exit_guard, state)
++            return
++
++
++    def print_stack_trace(self, state):
++        output = ""
++        prev_symbol = None
++
++        for bbl_addr in state.history.bbl_addrs:
++            # Symbol
++            symbol = self.proj.loader.find_symbol(bbl_addr, fuzzy=True)
++            # Disassembly adds symbol at the start of the function, we only
++            # add if we are not at the start and symbol differs from prev
++            if symbol.rebased_addr != bbl_addr and symbol != prev_symbol:
++                # Capstone did not add a symbol
++                max_bytes_per_line = 5
++                bytes_width = max_bytes_per_line * 3 + 3
++                output += " " * bytes_width + f";{symbol.name}+{bbl_addr-symbol.rebased_addr}:\n"
++
++            prev_symbol = symbol
+ 
+-        # Stop exploration here
+-        raise SplitException
++            # Add the assembly code
++            block = self.proj.factory.block(bbl_addr)
++            output += self.proj.analyses.Disassembly(ranges=[(block.addr, block.addr + block.size)]).render(color=color)
+ 
++            output += "\n"
+ 
+-    def run(self, proj: angr.Project, start_address) -> list[TransmissionExpr]:
++        print(output)
++
++
++
++    def run(self, proj: angr.Project, start_address, instructions_to_ignore) -> list[TransmissionExpr]:
+         """
+         Run the symbolic execution engine for a given number of basic blocks.
+         """
+-
++        self.proj = proj
+         state = proj.factory.blank_state(addr=start_address,
+                                         add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                     angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS,
+-                                                    angr.options.SIMPLIFY_CONSTRAINTS})
++                                                    angr.options.SIMPLIFY_CONSTRAINTS},
++                                        remove_options={angr.sim_options.COMPOSITE_SOLVER})
+ 
+         state.solver._solver.timeout = global_config["Z3Timeout"]
+ 
+@@ -596,23 +876,65 @@ class Scanner:
+         state.inspect.b('mem_read', when=angr.BP_AFTER, action=self.load_hook_after)
+         state.inspect.b('mem_write', when=angr.BP_BEFORE, action=self.store_hook_before)
+         state.inspect.b('exit', when=angr.BP_BEFORE, action=self.exit_hook_before)
++        # state.inspect.b('exit', when=angr.BP_AFTER, action=self.exit_hook_after)
+         state.inspect.b('address_concretization', when=angr.BP_AFTER, action=skip_concretization)
+-        state.inspect.b('expr', when=angr.BP_AFTER, action=self.expr_hook_after)
++        # state.inspect.b('engine_process', when=angr.BP_AFTER, action=self.engine_process_hook_before)
++        # state.inspect.b('engine_process', when=angr.BP_AFTER, action=self.engine_process_hook_after)
++
++        if global_config['HookCommonLinuxKernelFunctions']:
++            self.hooked_addresses = initialize_hooks(self, proj, instructions_to_ignore)
++
+ 
+         self.initialize_regs_and_stack(state)
+         self.thunk_list = get_x86_indirect_thunks(proj)
++        avoid_list = []
++        if global_config['AvoidLinuxKernelErrorPaths']:
++            avoid_list = get_avoid_list(proj)
+ 
+         # Run the symbolic execution engine.
+         state.globals['hist_0'] = state.addr
+         self.states = [state]
++        seen_bb = {}
++        counter = 0
++
+         while len(self.states) > 0:
+             # Pick the next state.
+-            self.cur_state = self.states.pop()
+-            l.info(f"Visiting {hex(self.cur_state.addr)}")
++            self.cur_state = self.states.pop(0)
++            n_states = len(self.states)
++            seen_bb[self.cur_state.addr] = seen_bb.setdefault(self.cur_state.addr, 0) + 1
++
++            l_verbose.info(f"Visiting {hex(self.cur_state.addr)}")
++
++            if self.cur_state.addr in avoid_list:
++                l.error(f"Avoiding!: {hex(self.cur_state.addr)} (#active states: {n_states})")
++                continue
++
++
++            if self.cur_state.addr not in self.hooked_addresses:
++
++                # if self.cur_state.addr in [0xffffffff814e6d5c]:
++                #     self.print_stack_trace(self.cur_state)
++                #     import IPython
++                #     IPython.embed()
++
++                local_bb_count = self.cur_state.history.jump_sources.count(self.cur_state.history.jump_source)
++
++                if local_bb_count >= 10:
++                    # len(set(list(self.cur_state.history.jump_sources)[-10:])) > 1: # Filter out rep instructions (same source and destination)
++                    symbol = proj.loader.find_symbol(self.cur_state.addr, fuzzy=True)
++                    l.error(f"Trimmed, loop detected: {hex(self.cur_state.addr)} (#active states: {n_states}) ({symbol.name if symbol else ''})")
++                    continue
++
++                if seen_bb[self.cur_state.addr] >= 10 and\
++                len(set(list(self.cur_state.history.jump_sources)[-5:])) > 1: # Filter out rep instructions (same source and destination)
++                    symbol = proj.loader.find_symbol(self.cur_state.addr, fuzzy=True)
++                    l.error(f"Trimmed, current BB seen {seen_bb[self.cur_state.addr]} times {hex(self.cur_state.addr)} ({symbol.name if symbol else ''}) (#active states: {n_states})")
++                    continue
+ 
+             # Stop if we have explored enough BBs.
+             if len([x for x in self.cur_state.history.jump_guards]) >= global_config["MaxBB"]:
+-                l.error(f"Trimmed. History: {[x for x in self.cur_state.history.jump_guards]}")
++                l.error(f"Trimmed {hex(self.cur_state.addr)}")
++                l_verbose.error(f"Trimmed. History: {[x for x in self.cur_state.history.jump_guards]}")
+                 continue
+ 
+             # Analyze this state.
+@@ -627,19 +949,18 @@ class Scanner:
+ 
+             except SplitException as e:
+                 # The state has been manually splitted: don't explore it further.
+-                l.error(str(e))
+                 continue
+             except (angr.errors.SimIRSBNoDecodeError, angr.errors.UnsupportedIROpError) as e:
+                 l.error("=============== UNSUPPORTED INSTRUCTION ===============")
+                 l.error(str(e))
+-                report_unsupported(e, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
++                report_unsupported(e, proj, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
+                 continue
+             except angr.errors.UnsupportedDirtyError as e:
+                 if "IRET" in str(e):
+                     continue
+                 l.error("=============== UNSUPPORTED INSTRUCTION ===============")
+                 l.error(str(e))
+-                report_unsupported(e, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
++                report_unsupported(e, proj, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
+                 continue
+             except Exception as e:
+                 # Catch test-case end error
+@@ -648,6 +969,8 @@ class Scanner:
+ 
+                 l.error("=============== ERROR ===============")
+                 l.error(str(e))
++                if str(e) == 'timeout':
++                    self.print_stack_trace(self.cur_state)
+                 if not l.disabled:
+                     traceback.format_exc()
+                 report_error(e, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
+@@ -659,19 +982,30 @@ class Scanner:
+                 ns.globals[f'hist_{self.n_hist}'] = ns.addr
+ 
+                 # Check if the last branch condition contains an if-then-else statement.
+-                asts = split_conditions(ns.history.jump_guards[-1], simplify=False, addr=ns.history.jump_sources[-1])
++                try:
++                    asts = split_conditions(ns.history.jump_guards[-1], simplify=False, addr=ns.history.jump_sources[-1])
++                except SplitTooManyNestedIfException as e:
++                    report_error(e, hex(self.cur_state.addr), hex(start_address), error_type="SCANNER")
++                    continue
++
+                 if len(asts) > 1:
+                     # If this is the case, we need to further split the successors.
+                     self.split_state(ns, asts, ns.addr, branch_split=True)
+                 else:
++                    # We can now safely let claripy simplify the constraints,
++                    # this reduces the solving timing significantly
++                    ns.solver.simplify()
+                     # If there's no splitting, just add the successor as-is.
+                     self.states.append(ns)
+ 
+-        # Print all loads.
+-        from tabulate import tabulate
+-        l.info(tabulate([[hex(x.pc),  str(x.addr),
+-                          "0" if get_load_annotation(x.val) == None else get_load_annotation(x.val).depth,
+-                           str(x.val), str(get_annotations(x.addr)), str(get_annotations(x.val)),
+-                          "none" if get_load_annotation(x.val) == None else get_load_annotation(x.val).requirements] for x in self.loads],
+-                        headers=["pc", "addr", "depth", "val", "addr annotations", "val annotations", "deps"]))
++
++        if not l_verbose.disabled:
++            # Print all loads. (If less than 50)
++            if len(self.loads) < 50:
++                from tabulate import tabulate
++                l_verbose.info(tabulate([[hex(x.pc),  str(x.addr),
++                                "0" if get_load_annotation(x.val) == None else get_load_annotation(x.val).depth,
++                                str(x.val), str(get_annotations(x.addr)), str(get_annotations(x.val)),
++                                "none" if get_load_annotation(x.val) == None else get_load_annotation(x.val).requirements] for x in self.loads],
++                                headers=["pc", "addr", "depth", "val", "addr annotations", "val annotations", "deps"]))
+ 
+diff --git a/analyzer/shared/astTransform.py b/analyzer/shared/astTransform.py
+index 6c3573b..40fa86a 100644
+--- a/analyzer/shared/astTransform.py
++++ b/analyzer/shared/astTransform.py
+@@ -13,6 +13,14 @@ from .logger import *
+ 
+ l = get_logger("AstTransform")
+ 
++class SplitTooManyNestedIfException(Exception):
++    "Too many if statements in expr, skipping"
++    pass
++
++    def __str__(self):
++        return f"SplitTooManyNestedIfException: Too many if statements in expr, skipping"
++
++
+ class ConditionType(Enum):
+     """
+     Track which instruction is associated to a given condition.
+@@ -332,7 +340,14 @@ def split_conditions(expr: claripy.BV, simplify: bool, addr) -> list[Conditional
+         new_expr = simplify_conservative(new_expr)
+ 
+     # Split if-then-else statements into separate ConditionalASTs.
+-    return split_if_statements(new_expr, addr)
++    # Skip if we have more than 10 (nested) if statements
++    if str(new_expr).count("else") > 10:
++        l.warning(f"split_conditions: Too many (nested) if conditions: {str(new_expr).count('else')}")
++        print(f"split_conditions: Too many (nested) if conditions: {str(new_expr).count('else')}")
++        raise SplitTooManyNestedIfException
++
++    x = split_if_statements(new_expr, addr)
++    return x
+ 
+ 
+ def simplify_conservative(e: claripy.T) -> claripy.T:
+diff --git a/analyzer/shared/config.py b/analyzer/shared/config.py
+index 1287c43..e4653bf 100644
+--- a/analyzer/shared/config.py
++++ b/analyzer/shared/config.py
+@@ -3,15 +3,37 @@ global_config = {}
+ def init_config(config):
+     global global_config
+ 
+-    # Apply default config.
++    # -- Apply default config.
++    # Timeout of the Z3 solver when evaluating constraints
+     global_config["Z3Timeout"] = 10*1000 # ms = 10s
++    # Maximum number of basic blocks to explore for each entrypoint
+     global_config["MaxBB"] = 5
++    # Forward stored values to subsequent loads
+     global_config["STLForwarding"] = True
++    # Distribute left shifts over + and -
+     global_config["DistributeShifts"] = True
++    # Analyze found gadgets directly during scanning, instead after scanning
+     global_config["AnalyzeDuringScanning"] = True
+-    global_config["LogLevel"] = 1
+-    global_config["TaintedFunctionPointers"] = True
++    # Mnemonics which are assumed to stop speculation
+     global_config["SpeculationStopMnemonics"] = {'lfence', 'mfence', 'cpuid'}
++    # Initialize the Linux kernel pt_regs struct in memory, referenced by rdi
++    global_config["InitializeControlledPTRegs"] = False
++    # Avoid the most common error paths in the Linux Kernel
++    global_config["AvoidLinuxKernelErrorPaths"] = False
++    # Hook common Linux kernel functions (approximating result)
++    global_config["HookCommonLinuxKernelFunctions"] = False
++    # Enable search for transmission gadgets
++    global_config["TransmissionGadgets"] = True
++    # Enable search for tainted function pointers (i.e. dispatch gadgets).
++    global_config["TaintedFunctionPointers"] = True
++    # If TFP enabled, also output function pointers with no taint
++    global_config["NonTaintedFunctionPointers"] = False
++    # If TFP enabled, also attacker controlled info for register dereferences
++    global_config["TaintedFunctionPointersRegisterDereference"] = False
++    # Enable search for secret dependent branches
++    global_config["SecretDependentBranches"] = True
++    # Verbosity of the logging output. 0-3: No / coarse-grained / fine-grained
++    global_config["LogLevel"] = 1
+ 
+     # Apply user config.
+     for c in config:
+diff --git a/analyzer/shared/logger.py b/analyzer/shared/logger.py
+index 1f309eb..22a9afb 100644
+--- a/analyzer/shared/logger.py
++++ b/analyzer/shared/logger.py
+@@ -21,8 +21,7 @@ class __CustomFormatter(logging.Formatter):
+             # Choose a different color for each logger.
+             c: int = zlib.adler32(name.encode()) % 7
+             c = (c + zlib.adler32(level.encode())) % 7
+-            if c != 0:  # Do not color black or white, allow 'uncolored'
+-                col = Color(c + Color.black.value)
++            col = Color(c + Color.black.value)
+             return color(col, False) + f"[{name}]  {message}{ENDC}"
+ 
+         else:
+diff --git a/analyzer/shared/ranges.py b/analyzer/shared/ranges.py
+index d175e49..b483fe9 100644
+--- a/analyzer/shared/ranges.py
++++ b/analyzer/shared/ranges.py
+@@ -78,7 +78,7 @@ class AstRange:
+             ('min', self.min),
+             ('max', self.max),
+             ('window', self.window),
+-            ('stride', 'None' if self.stride == None else self.stride),
++            ('stride', 0 if self.stride == None else self.stride),
+             ('and_mask', 'None' if self.and_mask == None else self.and_mask),
+             ('or_mask', 'None' if self.or_mask == None else self.or_mask),
+             ('exact', self.exact)
+diff --git a/analyzer/shared/secretDependentBranch.py b/analyzer/shared/secretDependentBranch.py
+new file mode 100644
+index 0000000..12f9a5b
+--- /dev/null
++++ b/analyzer/shared/secretDependentBranch.py
+@@ -0,0 +1,96 @@
++"""
++Secret Dependent Branch object.
++"""
++
++import claripy
++
++from . import ranges
++from . import utils
++from .transmission import Transmission, TransmissionComponent, TransmissionExpr, component_to_dict
++
++
++class SecretDependentBranchExpr(TransmissionExpr):
++    """
++    Symbolic expression representing a potential secret dependent branch.
++    Generated by the Scanner, is then later split into actual
++    SecretDependentBranch objects by the SecretDependentBranchAnalysis.
++    """
++    pass
++
++class SecretDependentBranch(Transmission):
++    """
++    Object that represents a Spectre transmission gadget, via a secret
++    dependent branch, with all the properties that can be extracted by our
++    analysis.
++    """
++
++    sdb_expr : claripy.BV
++    cmp_value : TransmissionComponent
++    controlled_cmp_value : TransmissionComponent
++    cmp_operation: str
++
++    def __init__(self, expr):
++        self.sdb_expr = expr
++        self.cmp_value = TransmissionComponent()
++        self.controlled_cmp_value = TransmissionComponent()
++        self.cmp_operation = expr.op
++
++    def __repr__(self):
++        return f"""
++        uuid: {self.uuid}
++        name: {self.name}
++        address: {hex(self.address)}
++        pc: {hex(self.pc)}
++        secret_load_pc: {hex(self.secret_load_pc)}
++        transmitter: {self.transmitter}
++        cmp_operation: {self.cmp_operation}
++
++        secret_dependent_branch:
++            {self.sdb_expr}
++        |-- transmission:
++            {self.transmission}
++          |-- base:
++            {self.base}
++                |-- secret-independent part:
++                {self.independent_base}
++          |-- transmitted secret:
++            {self.transmitted_secret}
++          |-- secret addr:
++            {self.secret_address}
++          |-- secret val:
++            {self.secret_val}
++        |-- cmp_value:
++            {self.cmp_value}
++                |-- controlled part:
++                {self.controlled_cmp_value}
++
++
++        branches: {utils.ordered_branches(self.branches)}
++        bbls: {[hex(x) for x in self.bbls]}
++        branch requirements: {self.branch_requirements}
++
++        constraints: {utils.ordered_constraints(self.constraints)}
++        constraint requirements: {self.constraint_requirements}
++
++        all requirements: {self.all_requirements}
++        all requirements_w_branches: {self.all_requirements_w_branches}
++
++        inferable_bits:
++            {self.inferable_bits}
++
++        aliases: {self.aliases}
++        n_instr: {self.n_instr}
++        n_dependent_loads: {self.max_load_depth}
++        properties:\n{self.dump_properties()}
++        """
++
++
++    def to_dict(self):
++        d = super().to_dict()
++
++        d['sdb_expr'] = self.sdb_expr
++        d['cmp_operation'] = self.cmp_operation
++        d['cmp_value'] = component_to_dict(self.cmp_value)
++        d['controlled_cmp_value'] = component_to_dict(self.controlled_cmp_value)
++
++        return d
+diff --git a/analyzer/shared/taintedFunctionPointer.py b/analyzer/shared/taintedFunctionPointer.py
+index b91d589..b9bfa7b 100644
+--- a/analyzer/shared/taintedFunctionPointer.py
++++ b/analyzer/shared/taintedFunctionPointer.py
+@@ -1,13 +1,28 @@
+ """
+ TaintedFunctionPointer object (a.k.a. dispatch gadget).
+ """
+-
+ from enum import Enum
+ from collections import OrderedDict
++from collections.abc import MutableMapping
+ from claripy import BVS
+ 
+ from .utils import ordered_branches, ordered_constraints
+ from . import ranges
++from .transmission import ControlType, Requirements
++
++
++def flatten_dict(dictionary, parent_key='', separator='_'):
++    """
++    Transform a hierarchy of nested objects into a flat dictionary.
++    """
++    items = []
++    for key, value in dictionary.items():
++        new_key = parent_key + separator + key if parent_key else key
++        if isinstance(value, MutableMapping):
++            items.extend(flatten_dict(value, new_key, separator=separator).items())
++        else:
++            items.append((new_key, value))
++    return dict(items)
+ 
+ class TFPRegisterControlType(Enum):
+     UNMODIFIED = 1,
+@@ -20,48 +35,101 @@ class TFPRegisterControlType(Enum):
+     UNKNOWN = 8
+ 
+ class TFPRegister():
+-    control: TFPRegisterControlType
++    reg: str
+     expr: BVS
++    controlled_expr: BVS
++    control: ControlType
++    control_type: TFPRegisterControlType
++
++    branches: list
++    constraints: list
++    requirements: Requirements
++
++    range: ranges.AstRange
++    range_with_branches: ranges.AstRange
++    controlled_range: ranges.AstRange
++    controlled_range_with_branches: ranges.AstRange
+ 
+-    def __init__(self, reg, expr) -> None:
++    is_dereferenced : bool
++    reg_dereferenced : list
++
++    def __init__(self, reg, expr, is_dereferenced = False) -> None:
+         self.reg = reg
+         self.expr = expr
++        self.is_dereferenced = is_dereferenced
++        self.controlled_expr = None
+ 
+-        self.control = TFPRegisterControlType.UNKNOWN
++        self.control = ControlType.UNKNOWN
++        self.control_type = TFPRegisterControlType.UNKNOWN
+         self.branches = []
+         self.constraints = []
+-        self.requirements = []
++        self.requirements = Requirements()
+         self.range = None
++        self.range_with_branches = None
++        self.controlled_range = None
++        self.controlled_range_with_branches = None
++        self.reg_dereferenced = []
+ 
+     def __repr__(self) -> str:
+         return f"""
+         reg: {self.reg}
+         expr: {self.expr}
++        controlled_expr: {self.controlled_expr}
+         control: {self.control}
++        control_type: {self.control_type}
+         branches: {ordered_branches(self.branches)}
+         constraints: {ordered_constraints(self.constraints)}
+         requirements: {self.requirements}
+         range: {self.range}
++        range_with_branches: {self.range_with_branches}
++        controlled_range: {self.controlled_range}
++        controlled_range_with_branches: {self.controlled_range_with_branches}
+         """
+ 
+     def to_dict(self):
++        reg_dereferenced_dict = {}
++        for r in self.reg_dereferenced:
++            new_dict = {
++            r.reg :
++                {
++                'reg' : r.reg,
++                'expr' : str(r.expr),
++                'controlled_expr' : str(r.controlled_expr),
++                'control' : str(r.control),
++                'control_type' : str(r.control_type),
++                'branches' : ordered_branches(r.branches),
++                'constraints' : ordered_constraints(r.constraints),
++                'controlled_range' : dict(ranges.AstRange(0,0,0,False).to_dict() if r.controlled_range == None else r.controlled_range.to_dict()),
++                'controlled_range_with_branches' : dict(ranges.AstRange(0,0,0,False).to_dict() if r.controlled_range_with_branches == None else r.controlled_range_with_branches.to_dict()),
++                }
++            }
++
++            reg_dereferenced_dict[r.reg] = flatten_dict(new_dict)
++
+         return OrderedDict([
+         ("reg", self.reg),
+         ("expr", self.expr),
++        ("is_dereferenced", self.is_dereferenced),
++        ("controlled_expr", self.expr),
+         ("control", self.control),
++        ("control_type", self.control_type),
+         ("branches", ordered_branches(self.branches)),
+         ("constraints", ordered_constraints(self.constraints)),
+-        ("requirements", self.requirements),
+-        ("range", self.range)
++        ("requirements", self.requirements.to_dict()),
++        ("range", ranges.AstRange(0,0,0,False).to_dict() if self.range == None else self.range.to_dict()),
++        ("range_with_branches", ranges.AstRange(0,0,0,False).to_dict() if self.range_with_branches == None else self.range_with_branches.to_dict()),
++        ("controlled_range", ranges.AstRange(0,0,0,False).to_dict() if self.controlled_range == None else self.controlled_range.to_dict()),
++        ("controlled_range_with_branches", ranges.AstRange(0,0,0,False).to_dict() if self.controlled_range_with_branches == None else self.controlled_range_with_branches.to_dict()),
++        ("reg_dereferenced", str(reg_dereferenced_dict))
+         ])
+ 
+     def copy(self):
+-        new_t = TFPRegister(self.reg, self.expr)
+-        new_t.control = self.control
+-        new_t.branches.extend(self.branches)
+-        new_t.constraints.extend(self.constraints)
+-        new_t.requirements.extend(self.requirements)
+-        new_t.range = self.range
++        new_t = TFPRegister(self.reg, self.expr, self.is_dereferenced)
++        # Copy all values
++        new_t.__dict__.update(self.__dict__)
++        # Shallow copy mutable values
++        new_t.branches = self.branches.copy()
++        new_t.constraints = self.constraints.copy()
+         return new_t
+ 
+ 
+@@ -70,22 +138,41 @@ class TaintedFunctionPointer():
+     name: str
+     address: int
+     pc: int
++    pc_symbol : str
++    address_symbol : str
++
++    expr: BVS
++    reg: str
++
++    n_instr : int
++    n_control_flow_changes: int
++
++    control: ControlType
+ 
+     registers: dict[str, TFPRegister]
+ 
+-    def __init__(self, pc, expr, reg, bbls, branches, constraints,  aliases, n_instr, contains_spec_stop, n_dependent_loads) -> None:
++    contains_spec_stop : bool
++    approximated_indirect_branch_path : bool
++
++    def __init__(self, pc, expr, reg, bbls, branches, constraints,  aliases, n_instr, n_control_flow_changes, contains_spec_stop, n_dependent_loads, approximated_indirect_branch_path) -> None:
+         self.uuid = ""
+         self.name = ""
+         self.address = 0
+         self.pc = pc
++        self.pc_symbol = ""
++        self.address_symbol = ""
+ 
+         self.n_instr = n_instr
++        self.n_control_flow_changes = n_control_flow_changes
+         self.contains_spec_stop = contains_spec_stop
+         self.n_dependent_loads = n_dependent_loads
++        self.approximated_indirect_branch_path = approximated_indirect_branch_path
+         self.n_branches = len(branches)
+         self.reg = reg
+         self.expr = expr
++        self.control = ControlType.UNKNOWN
+         self.range = None
++        self.range_with_branches = None
+         self.all_branches = []
+         self.all_branches.extend(branches)
+         self.all_constraints = []
+@@ -96,7 +183,7 @@ class TaintedFunctionPointer():
+         self.bbls.extend(bbls)
+ 
+         # Constraints only applying on tfp.expr
+-        self.requirements = []
++        self.requirements = Requirements()
+         self.constraints = []
+         self.branches = []
+ 
+@@ -121,6 +208,9 @@ class TaintedFunctionPointer():
+         pc: {hex(self.pc)}
+         reg: {self.reg}
+         expr: {self.expr}
++        control: {self.control}
++        range: {self.range}
++        range_with_branches: {self.range_with_branches}
+ 
+         controlled: {self.controlled}
+         uncontrolled: {self.uncontrolled}
+@@ -142,17 +232,23 @@ class TaintedFunctionPointer():
+         ("uuid", self.uuid),
+         ("name", self.name),
+         ("address", hex(self.address)),
++        ("address_symbol", self.address_symbol),
++        ("pc", hex(self.pc)),
++        ("pc_symbol", self.pc_symbol),
+         ("n_instr", self.n_instr),
++        ("n_control_flow_changes", self.n_control_flow_changes),
+         ("n_dependent_loads", self.n_dependent_loads),
+         ("n_branches", self.n_branches),
+         ("contains_spec_stop", self.contains_spec_stop),
+-        ("pc", hex(self.pc)),
++        ("approximated_indirect_branch_path", self.approximated_indirect_branch_path),
+         ("reg", self.reg),
+         ("expr", self.expr),
++        ("control", self.control),
+         ("range", ranges.AstRange(0,0,0,False).to_dict() if self.range == None else self.range.to_dict()),
++        ("range_with_branches", ranges.AstRange(0,0,0,False).to_dict() if self.range_with_branches == None else self.range_with_branches.to_dict()),
+         ("branches", ordered_branches(self.constraints)),
+         ("constraints", ordered_constraints(self.branches)),
+-        ("requirements", self.requirements),
++        ("requirements", self.requirements.to_dict()),
+         ("all_branches", ordered_branches(self.all_constraints)),
+         ("all_constraints", ordered_constraints(self.all_branches)),
+         ("aliases", self.aliases),
+@@ -167,7 +263,8 @@ class TaintedFunctionPointer():
+         ])
+ 
+         for r in self.registers.values():
+-            d[r.reg] = r.to_dict()
++            if not r.is_dereferenced:
++                d[r.reg] = r.to_dict()
+ 
+         return d
+ 
+@@ -180,11 +277,14 @@ class TaintedFunctionPointer():
+                                          constraints=self.all_constraints,
+                                          aliases=self.aliases,
+                                          n_instr=self.n_instr,
++                                         n_control_flow_changes=self.n_control_flow_changes,
+                                          contains_spec_stop=self.contains_spec_stop,
+-                                         n_dependent_loads=self.n_dependent_loads)
++                                         n_dependent_loads=self.n_dependent_loads,
++                                         approximated_indirect_branch_path=self.approximated_indirect_branch_path)
++        new_tfp.control = new_tfp.control
+         new_tfp.constraints.extend(self.constraints)
+         new_tfp.branches.extend(self.branches)
+-        new_tfp.requirements.extend(self.requirements)
++        new_tfp.requirements = self.requirements
+         new_tfp.range = self.range
+         new_tfp.controlled.extend(self.controlled)
+         new_tfp.uncontrolled.extend(self.uncontrolled)
+@@ -194,4 +294,5 @@ class TaintedFunctionPointer():
+ 
+         for r in self.registers:
+             new_tfp.registers[r] = self.registers[r].copy()
++
+         return new_tfp
+diff --git a/analyzer/shared/transmission.py b/analyzer/shared/transmission.py
+index 96522a6..c814d48 100644
+--- a/analyzer/shared/transmission.py
++++ b/analyzer/shared/transmission.py
+@@ -14,6 +14,7 @@ class TransmitterType(Enum):
+     LOAD = 1,
+     STORE = 2,
+     CODE_LOAD = 3
++    SECRET_DEP_BRANCH = 4
+ 
+ class ControlType(Enum):
+     NO_CONTROL = 0,
+@@ -91,9 +92,11 @@ class TransmissionExpr:
+     branches: list[tuple[int, claripy.BV, str],]
+     constraints: list[tuple[int, claripy.BV]]
+     n_instr: int
++    n_control_flow_changes: int
+     contains_spec_stop: bool
++    approximated_indirect_branch_path: bool
+ 
+-    def __init__(self, pc: int, expr: claripy.BV, transmitter: TransmitterType, bbls, branches, aliases, constraints, n_instr, contains_spec_stop):
++    def __init__(self, pc: int, expr: claripy.BV, transmitter: TransmitterType, bbls, branches, aliases, constraints, n_instr, n_control_flow_changes, contains_spec_stop, approximated_indirect_branch_path):
+         self.pc = pc
+         self.expr = expr
+         self.transmitter = transmitter
+@@ -103,7 +106,9 @@ class TransmissionExpr:
+         self.branches = branches
+         self.bbls = bbls
+         self.n_instr = n_instr
++        self.n_control_flow_changes = n_control_flow_changes
+         self.contains_spec_stop = contains_spec_stop
++        self.approximated_indirect_branch_path = approximated_indirect_branch_path
+ 
+     def __repr__(self):
+         return f"""
+@@ -116,6 +121,7 @@ class TransmissionExpr:
+                 constraints: {utils.ordered_constraints(self.constraints)}
+                 n_instr: {self.n_instr}
+                 contains_spec_stop: {self.contains_spec_stop}
++                approximated_indirect_branch_path: {self.approximated_indirect_branch_path}
+                 """
+ 
+ class TransmissionComponent():
+@@ -181,9 +187,13 @@ class Transmission():
+     address: int
+     pc: int
+     secret_load_pc: int
++    pc_symbol : str
++    address_symbol : str
+     transmitter: TransmitterType
+     n_instr: int
++    n_control_flow_changes: int
+     contains_spec_stop: bool
++    approximated_indirect_branch_path: bool
+     max_load_depth: int
+ 
+     # Components.
+@@ -215,9 +225,13 @@ class Transmission():
+         self.address = 0
+         self.pc = t.pc
+         self.secret_load_pc = 0
++        self.pc_symbol = ""
++        self.address_symbol = ""
+         self.transmitter = t.transmitter
+         self.n_instr = t.n_instr
++        self.n_control_flow_changes = t.n_control_flow_changes
+         self.contains_spec_stop = t.contains_spec_stop
++        self.approximated_indirect_branch_path = t.approximated_indirect_branch_path
+         self.max_load_depth = 0
+ 
+         self.transmission = TransmissionComponent()
+@@ -300,12 +314,16 @@ class Transmission():
+         d['uuid'] = self.uuid
+         d['name'] = self.name
+         d['address'] = hex(self.address)
++        d['address_symbol'] = self.address_symbol
+         d['pc'] = hex(self.pc)
++        d['pc_symbol'] = self.pc_symbol
+         d['secret_load_pc'] = hex(self.secret_load_pc)
+         d['transmitter'] = str(self.transmitter)
+         d['n_instr'] = self.n_instr
++        d['n_control_flow_changes'] = self.n_control_flow_changes
+         d['n_dependent_loads'] = self.max_load_depth
+         d['contains_spec_stop'] = self.contains_spec_stop
++        d['approximated_indirect_branch_path'] = self.approximated_indirect_branch_path
+         d['bbls'] = str([hex(x) for x in self.bbls])
+ 
+         d['transmission'] = self.transmission.to_dict()
+@@ -318,11 +336,11 @@ class Transmission():
+         d['secret_val'] = self.secret_val.to_dict()
+ 
+         d['branches'] = utils.ordered_branches(self.branches)
+-        d['branch_requirements'] = self.branch_requirements
++        d['branch_requirements'] = self.branch_requirements.to_dict()
+         d['constraints'] = utils.ordered_constraints(self.constraints)
+-        d['constraint_requirements'] = self.constraint_requirements
+-        d['all_requirements'] = self.all_requirements
+-        d['all_requirements_w_branches'] = self.all_requirements_w_branches
++        d['constraint_requirements'] = self.constraint_requirements.to_dict()
++        d['all_requirements'] = self.all_requirements.to_dict()
++        d['all_requirements_w_branches'] = self.all_requirements_w_branches.to_dict()
+ 
+         d['inferable_bits'] = self.inferable_bits.to_dict()
+         d['aliases'] = [str(x.to_BV()) for x in self.aliases]
+@@ -330,4 +348,12 @@ class Transmission():
+         for p in self.properties:
+             d[p] = str(self.properties[p])
+ 
++        # Properties only used for child class Secret Dependent branch
++        # We initialize them to None to have consisted data columns
++        d['sdb_expr'] =  None
++        d['cmp_operation'] = None
++        d['cmp_value'] = component_to_dict(None)
++        d['controlled_cmp_value'] = component_to_dict(None)
++
++
+         return d
+diff --git a/analyzer/shared/utils.py b/analyzer/shared/utils.py
+index c0c67e7..89ebaee 100644
+--- a/analyzer/shared/utils.py
++++ b/analyzer/shared/utils.py
+@@ -1,4 +1,5 @@
+ import claripy
++import capstone
+ import itertools
+ import traceback
+ 
+@@ -48,6 +49,43 @@ def get_x86_indirect_thunks(proj):
+ 
+     return ind_calls
+ 
++def get_avoid_list(proj):
++    symbol_names = [
++                    # common error paths
++                    '__stack_chk_fail',
++                    'panic',
++                    'usercopy_abort',
++                    '__warn_printk',
++                    'refcount_warn_saturate',
++                    '__schedule_bug',
++                    'kick_process',
++                    # print functions
++                    '_printk',
++                    'vprintk',
++                    'vprintk_deferred',
++                    'vprintk_emit',
++                    # UBSAN
++                    '__ubsan_handle_alignment_assumption',
++                    '__ubsan_handle_builtin_unreachable',
++                    '__ubsan_handle_divrem_overflow',
++                    '__ubsan_handle_load_invalid_value',
++                    '__ubsan_handle_out_of_bounds',
++                    '__ubsan_handle_shift_out_of_bounds',
++                    '__ubsan_handle_type_mismatch',
++                    '__ubsan_handle_type_mismatch_v1',
++                    'ubsan_epilogue',
++                    'ubsan_prologue',
++                    'ubsan_type_mismatch_common',
++                    ]
++    ind_calls = []
++
++    for symbol in symbol_names:
++        addr = proj.loader.find_symbol(symbol)
++        if addr:
++            ind_calls.append(addr.rebased_addr)
++
++    return ind_calls
++
+ def get_x86_registers():
+     return  ["rax", "rbx", "rcx", "rdx", "rsi",
+              "rdi", "rbp", "rsp", "r8" , "r9",
+@@ -67,13 +105,21 @@ def report_error(error: Exception, where="dunno", start_addr="dunno", error_type
+     o.write("\n")
+     o.close()
+ 
+-def report_unsupported(error: Exception, where="dunno", start_addr="dunno", error_type="GENERIC"):
++def report_unsupported(error: Exception, proj, where="dunno", start_addr="dunno", error_type="GENERIC"):
+     if hasattr(error, 'ins_addr') and isinstance(error.ins_addr, int):
+         where = hex(error.ins_addr)
+ 
++    try:
++        mnemonic = get_mnemonic_at_address(proj, int(where, 16))
++    except ValueError:
++        mnemonic = ''
++
++    if mnemonic == 'ud2':
++        return
++
+     o = open("unsupported.txt", "a+")
+     o.write(f"---------------- [ {error_type} UNSUPPORTED INSTRUCTION ] ----------------\n")
+-    o.write(f"instruction addr: {where}     started at: {start_addr}\n")
++    o.write(f"instruction addr: {where}     started at: {start_addr}     mnemonic: '{mnemonic}'\n")
+     o.write(str(error) + "\n")
+     o.write("\n")
+     o.close()
+@@ -104,8 +150,22 @@ def branch_outcomes(history):
+ 
+ def ordered_branches(branches):
+     branches = sorted(branches, key=lambda x: x[0])
+-    return [(hex(addr), cond, taken) for addr, cond, taken in branches]
++    return [(hex(addr), str(cond), taken) for addr, cond, taken in branches]
+ 
+ def ordered_constraints(constraints):
+     constraints = sorted(constraints, key=lambda x: x[0])
+-    return [(hex(addr), cond, str(ctype)) for addr, cond, ctype in constraints]
++    return [(hex(addr), str(cond), str(ctype)) for addr, cond, ctype in constraints]
++
++def get_mnemonic_at_address(proj, address):
++    proj.loader.memory.seek(address)
++    bytes = proj.loader.memory.read(10)
++    if not bytes:
++        return ''
++
++    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
++    md.detail = True
++    instructions = list(md.disasm(bytes, 0))
++    if not instructions:
++        return ''
++
++    return instructions[0].mnemonic
+diff --git a/docs/configuration.md b/docs/configuration.md
+index e0bdb32..9c33902 100644
+--- a/docs/configuration.md
++++ b/docs/configuration.md
+@@ -51,8 +51,26 @@ MaxBB: 5
+ # Distribute left shifts over + and -.
+ DistributeShifts: True
+ 
+-# Also look for tainted function pointers (i.e. dispatch gadgets).
++# Analyze found gadgets directly during scanning, instead after scanning
++AnalyzeDuringScanning: True
++
++# Mnemonics which are assumed to stop speculation
++SpeculationStopMnemonics: {'lfence', 'mfence', 'cpuid'}
++
++# Initialize the Linux kernel pt_regs struct in memory, referenced by rdi
++InitializeControlledPTRegs: False
++
++# Enable search for transmission gadgets
++TransmissionGadgets: True
++
++# Enable search for tainted function pointers (i.e. dispatch gadgets).
+ TaintedFunctionPointers: True
++
++# If TFP enabled, also output function pointers with no taint
++NotTaintedFunctionPointers: False
++
++# Enable search for secret dependent branches
++SecretDependentBranches: True
+ ```
+ 
+ Note that, since InSpectre Gadget lists which registers and memory locations are
+@@ -67,5 +85,9 @@ Some other parameters that can be tweaked are:
+   to subsequent loads to the same address
+ - **DistributeShifts**: When enabled, left-shift expressions like
+   `(rax + rbx) << 8` will be treated as `(rax << 8) + (rbx << 8)` during range and control analysis
++- **TransmissionGadgets**: When enabled, the scanner will scan for
++  TransmissionGadgets (e.g, cache-covert channel gadgets)
+ - **TaintedFunctionPointers**: When enabled, the scanner will scan also for
+   TaintedFunctionPointers (a.k.a dispatch gadgets, see the paper for more details)
++- **TaintedFunctionPointers**: When enabled, the scanner will scan also for
++  SecretDependentBranches (i.e., a branch which condition depends on a secret)
+diff --git a/inspectre b/inspectre
+index 6d5ba10..a45ca9c 100755
+--- a/inspectre
++++ b/inspectre
+@@ -4,6 +4,7 @@ import argparse
+ import csv
+ import subprocess
+ import os
++import json
+ 
+ from  analyzer import analyzer
+ from reasoner import reasoner
+@@ -14,11 +15,43 @@ def parse_gadget_list(filename):
+     file.close()
+ 
+     if len(data[0]) != 2:
+-        print("Invalid CSV: gadgets should be in the form of <hex_address>,<name")
++        print("Invalid CSV: gadgets should be in the form of <hex_address>,<name>")
+         exit(-1)
+ 
+     return data
+ 
++def parse_ignore_instruction_list(filename):
++    file = open(filename, "r")
++    data = list(csv.reader(file, delimiter=","))
++    file.close()
++
++    if len(data[0]) != 2:
++        print("Invalid CSV: invalid instructions list should be in the form of <hex_address>,<length>")
++        exit(-1)
++
++    parsed = [[int(x[0], 16), int(x[1])] for x in data[1:]]
++
++    return parsed
++
++def parse_indirect_branch_targets(filename):
++
++    with open(filename) as file:
++        d = json.load(file)
++
++    if len(d) == 0:
++        print("ERROR: Empty indirect branch target JSON file!")
++        exit(-1)
++
++    if any(not isinstance(v, list) for v in d.values()):
++        print("ERROR: Dict value of indirect branch target JSON is not a list!")
++        exit(-1)
++
++    parsed = {}
++    for k, v in d.items():
++        parsed[int(k, 16)] = [int(target, 16) for target in v]
++
++    return parsed
++
+ 
+ def run_analyzer(args):
+     # No support for mutually exclusivity between a group of 1 and 2 arguments
+@@ -41,6 +74,16 @@ def run_analyzer(args):
+     else:
+         base_address = int(args.base_address, 16)
+ 
++    # Parse ignore instruction list
++    instructions_to_ignore = []
++    if args.ignore_instructions_list:
++        instructions_to_ignore = parse_ignore_instruction_list(args.ignore_instructions_list)
++
++    # Load indirect branch targets
++    indirect_branch_targets = {}
++    if args.indirect_branch_targets:
++        indirect_branch_targets = parse_indirect_branch_targets(args.indirect_branch_targets)
++
+     analyzer.run(binary=args.binary,
+                  config_file=args.config,
+                  base_address=base_address,
+@@ -49,7 +92,9 @@ def run_analyzer(args):
+                  csv_filename=args.output,
+                  tfp_csv_filename=args.tfp_output,
+                  asm_folder=args.asm,
+-                 symbol_binary=args.symbol_binary)
++                 symbol_binary=args.symbol_binary,
++                 instructions_to_ignore=instructions_to_ignore,
++                 indirect_branch_targets=indirect_branch_targets)
+ 
+ 
+ def run_reasoner(args):
+@@ -83,6 +128,8 @@ if __name__ == '__main__':
+     analyzer_args.add_argument('--cache-project', action='store_true', help='load the angr project from a pickle named <BINARY>.angr, or create one if it does not exist')
+     analyzer_args.add_argument('--base-address', required=False, default='', help='base address of the binary to analyze')
+     analyzer_args.add_argument("--symbol-binary", default='', help='binary that contains function symbols')
++    analyzer_args.add_argument("--ignore-instructions-list", default='', help='file with a list of instructions to ignore in the format <HEX_ADDRESS>,<LENGTH>')
++    analyzer_args.add_argument("--indirect-branch-targets", default='', help='JSON file with a target locations for indirect branches {"indirect_branch_pc" : [list_of_targets_pc], }')
+ 
+     # Outputs.
+     analyzer_args.add_argument('--output', required=False, default='', help='output all found gadgets to a CSV')
+diff --git a/reasoner/reasoner.py b/reasoner/reasoner.py
+index 1ae34df..90f4aa8 100644
+--- a/reasoner/reasoner.py
++++ b/reasoner/reasoner.py
+@@ -3,6 +3,8 @@ import pandas as pd
+ import numpy as np
+ from io import StringIO
+ 
++from . import reasoner_tfp
++
+ from warnings import simplefilter
+ simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+ 
+@@ -534,12 +536,32 @@ def run(in_csv, out_csv):
+     file.close()
+ 
+     df = pd.read_csv(StringIO(data), delimiter=';')
++
++
++    if 'transmission_expr' not in df.columns:
++        return reasoner_tfp.run(in_csv, out_csv)
++
+     # df.fillna(0, inplace=True)
+ 
++    # TODO: Add support for Secret Dependent Branch
++    # for now we filter them out and add them in the end
++    df_sdb = df[df['transmitter'] == 'TransmitterType.SECRET_DEP_BRANCH']
++    print(f"Total {len(df_sdb)} Secret Dependent Branches (not reasoned)")
++
++    df = df[df['transmitter'] != 'TransmitterType.SECRET_DEP_BRANCH']
++
++    if df.empty:
++        print(f"[-] Imported {len(df)} gadgets")
++        return
++
+     integer_cols = ['base_range_max',
+                     'base_range_min',
+                     'base_range_stride',
+                     'base_range_window',
++                    'independent_base_range_max',
++                    'independent_base_range_min',
++                    'independent_base_range_stride',
++                    'independent_base_range_window',
+                     # 'base_size',
+                     'inferable_bits_n_inferable_bits',
+                     'inferable_bits_spread_high',
+@@ -571,7 +593,9 @@ def run(in_csv, out_csv):
+     # Transform columns.
+     for i in integer_cols:
+         df[i] = df[i].fillna(0)
+-        df[i] = df[i].astype('float64', errors='ignore')
++        df[i] = df[i].replace('', 0)
++        df[i] = df[i].astype('float64')
++
+ 
+     df['base_size'] = df.apply(calc_base_size, axis=1)
+     df['transmitted_secret_size'] = df.apply(calc_transmitted_secret_size, axis=1)
+@@ -640,6 +664,9 @@ def run(in_csv, out_csv):
+ 
+     print(f"Found {len(df[df['exploitable_w_slam'] == True])} exploitable gadgets!")
+ 
++    # add the DSP gadgets
++    df = pd.concat([df, df_sdb])
++
+     # Save to new file.
+     print(f"[-] Saving to {out_csv}")
+     df.to_csv(out_csv, sep=';', index=False)
+diff --git a/reasoner/reasoner_tfp.py b/reasoner/reasoner_tfp.py
+new file mode 100644
+index 0000000..1455c68
+--- /dev/null
++++ b/reasoner/reasoner_tfp.py
+@@ -0,0 +1,365 @@
++import argparse
++import pandas as pd
++import numpy as np
++from io import StringIO
++import csv
++
++
++from warnings import simplefilter
++simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
++
++MIN_REG_CONTROL_WINDOW = 0xffff
++
++VALID_ADDRESS_MAX = 0xffffffff9fffffff
++VALID_ADDRESS_MIN = 0xffff800000000000
++
++MAPPED_REGIONS = [
++    (0xffffffff81000000, 0xffffffff84000000),
++    (0xffff888000000000, 0xffffc87fffffffff)
++]
++
++CANONICAL_REGIONS = [
++    (0x0000000000000000, 0x00007fffffffffff),
++    (0xffff800000000000, 0xffffffff9fffffff)
++]
++
++CACHE_SHIFT = 6
++PAGE_SHIFT = 12
++ADDRESS_BIT_LEN = 64
++
++with_branches = False
++
++def is_in_range(n, min, max):
++    if min <= max:
++        return n >= min and n <= max
++    else:
++        return n >= min or n <= max
++
++def is_overlapping(x_min, x_max, y_min, y_max):
++    return x_max >= y_min and y_max >= x_min
++
++
++def get_pc_as_number(t: pd.Series):
++    return str(int(t['pc'], 16))
++
++def get_x86_registers():
++    return  ["rax", "rbx", "rcx", "rdx", "rsi",
++             "rdi", "rbp", "rsp", "r8" , "r9",
++             "r10", "r11", "r12", "r13", "r14", "r15"]
++
++def calc_reg_size(t: pd.Series, reg):
++    if t[f'{reg}_expr'] == '':
++        return 0
++    try:
++        assert(t[f'{reg}_expr'].startswith('<BV'))
++    except:
++        return 0
++    return int(t[f'{reg}_expr'].split(' ')[0].replace('<BV',''))
++
++def eval_column_to_dict(t : pd.Series, column):
++
++    lst = eval(t[column])
++    assert(type(lst) == dict)
++
++    return lst
++
++
++
++# ----------------- Basic checks
++
++def is_register_sufficiently_controlled(t : pd.Series, reg):
++
++    if t[f"{reg}_control"] != "ControlType.CONTROLLED":
++        return False
++
++    if t[f"{reg}_control_type"] in ["TFPRegisterControlType.INDIRECTLY_DEPENDS_ON_TFP_EXPR", "TFPRegisterControlType.DEPENDS_ON_TFP_EXPR"]:
++        return False
++
++    # Workaround: Check if load-chain is not controlled:
++    # For example: <BV64 LOAD [  LOAD_64[<BV64 0x32880 + gs>]  + (0#32 .. 0xffffffff & rdi[31:0]) ]
++    if "gs" in t[f"{reg}_controlled_expr"]:
++        return False
++
++
++    # Check the range
++    reg_min = t[f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_min']
++    reg_max = t[f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_max']
++    reg_window = t[f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_window']
++
++    if reg_window < MIN_REG_CONTROL_WINDOW:
++        return False
++
++    for r in MAPPED_REGIONS:
++        if reg_min <= reg_max:
++            if not is_overlapping(reg_min, reg_max, r[0], r[1]):
++                return False
++        elif not (is_overlapping(0, reg_max, r[0], r[1]) or
++               is_overlapping(reg_min, (2 ** t[f'{reg}_size']) - 1, r[0], r[1])):
++                return False
++
++    return True
++
++def is_register_fully_controlled(t : pd.Series, reg):
++
++    if not is_register_sufficiently_controlled(t, reg):
++        return False
++
++    # Check the range
++    if t[f"{reg}_controlled_range_window"] < (2 ** t[f'{reg}_size']) - 1:
++        return False
++
++    return True
++
++def get_indirect_offsets_sufficiently_controlled(t : pd.Series, reg):
++
++    sufficiently_controlled = []
++
++    for r_str, r_dict in t[f'{reg}_reg_dereferenced'].items():
++        # add reg as prefix, expected by other functions
++        if is_register_sufficiently_controlled(r_dict, r_str):
++            sufficiently_controlled.append(r_str)
++
++    return sufficiently_controlled
++
++def get_indirect_offsets_fully_controlled(t : pd.Series, reg):
++
++    sufficiently_controlled = []
++
++    for r_str, r_dict in t[f'{reg}_reg_dereferenced'].items():
++        # add reg as prefix, expected by other functions
++        r_dict[f'{r_str}_size'] = calc_reg_size(r_dict, r_str)
++        if is_register_fully_controlled(r_dict, r_str):
++            sufficiently_controlled.append(r_str)
++
++    return sufficiently_controlled
++
++
++def get_sufficiently_controlled_registers(t : pd.Series, reg_type):
++    controlled = []
++
++    # Direct controlled registers (1 || 3)
++    if reg_type & 1:
++        for reg in get_x86_registers():
++            if t['reg'] == reg:
++                continue
++
++            if t[f'{reg}_controlled_sufficiently{"" if not with_branches else "_w_branches"}']:
++                controlled.append(reg)
++
++    # Indirect controlled registers (2 || 3)
++    if reg_type & 2:
++        for reg in get_x86_registers():
++            if t['reg'] == reg:
++                continue
++
++            controlled += t[f'{reg}_controlled_sufficiently_indirect{"" if not with_branches else "_w_branches"}']
++
++    return controlled, len(controlled)
++
++def get_fully_controlled_registers(t : pd.Series, reg_type):
++    controlled = []
++
++    # Direct controlled registers (1 || 3)
++    if reg_type & 1:
++        for reg in get_x86_registers():
++            if t['reg'] == reg:
++                continue
++
++            if t[f'{reg}_controlled_fully']:
++                controlled.append(reg)
++
++    # Indirect controlled registers (2 || 3)
++    if reg_type & 2:
++        for reg in get_x86_registers():
++            if t['reg'] == reg:
++                continue
++
++            controlled += t[f'{reg}_controlled_fully_indirect{"" if not with_branches else "_w_branches"}']
++
++    return controlled, len(controlled)
++
++def get_tfp_control(t : pd.Series):
++
++    reg = t['reg']
++
++    if reg in get_x86_registers():
++        controlled_sufficiently = t[f'{reg}_controlled_sufficiently{"" if not with_branches else "_w_branches"}']
++        controlled_fully = t[f'{reg}_controlled_fully{"" if not with_branches else "_w_branches"}']
++
++    else:
++        # We might want to add controlled_range for tfp expr to do more
++        # fine-grained
++        if t[f"control"] != "ControlType.CONTROLLED" or "gs" in t[f"expr"]:
++            controlled_sufficiently = False
++            controlled_fully = False
++
++        else:
++            controlled_sufficiently = True
++            controlled_fully = True
++
++    return controlled_sufficiently, controlled_fully
++
++
++
++# ----------------- Evaluation
++
++def is_exploitable(t : pd.Series):
++
++    fail_reasons = []
++    exploitable = True
++
++    if not t[f'control_sufficiently{"" if not with_branches else "_w_branches"}']:
++        fail_reasons.append(f'is_tfp_controlled_sufficiently{"" if not with_branches else "_w_branches"}')
++        exploitable = False
++
++    controlled = eval(t['controlled'])
++
++    if t['reg'] in controlled:
++        if len(controlled) == 1:
++            fail_reasons.append(f'has_extra_controlled_registers{"" if not with_branches else "_w_branches"}')
++            exploitable = False
++    else:
++        if len(controlled) == 0:
++            fail_reasons.append(f'has_extra_controlled_registers{"" if not with_branches else "_w_branches"}')
++            exploitable = False
++
++    return exploitable, fail_reasons
++
++
++def add_extra_info(df):
++
++    for reg in get_x86_registers():
++        df[f'{reg}_controlled_sufficiently{"" if not with_branches else "_w_branches"}'] = df.apply(is_register_sufficiently_controlled, axis=1, args=(reg,))
++        df[f'{reg}_controlled_sufficiently_indirect{"" if not with_branches else "_w_branches"}'] = df.apply(get_indirect_offsets_sufficiently_controlled, axis=1, args=(reg,))
++
++    for reg in get_x86_registers():
++        df[f'{reg}_controlled_fully{"" if not with_branches else "_w_branches"}'] = df.apply(is_register_fully_controlled, axis=1, args=(reg,))
++        df[f'{reg}_controlled_fully_indirect{"" if not with_branches else "_w_branches"}'] = df.apply(get_indirect_offsets_fully_controlled, axis=1, args=(reg,))
++
++
++    # Direct controlled registers (0)
++    df[[f'controlled_sufficiently{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_sufficiently{"" if not with_branches else "_w_branches"}']] = df.apply(get_sufficiently_controlled_registers, axis=1, args=(1,), result_type="expand")
++    df[[f'controlled_fully{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_fully{"" if not with_branches else "_w_branches"}']] = df.apply(get_fully_controlled_registers, axis=1, args=(1,), result_type='expand')
++
++    # Indirect controlled registers (1)
++    df[[f'controlled_sufficiently_indirect{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_sufficiently_indirect{"" if not with_branches else "_w_branches"}']] = df.apply(get_sufficiently_controlled_registers, axis=1, args=(2,), result_type="expand")
++    df[[f'controlled_fully_indirect{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_fully_indirect{"" if not with_branches else "_w_branches"}']] = df.apply(get_fully_controlled_registers, axis=1, args=(2,), result_type='expand')
++
++    # All controlled registers (2)
++    df[[f'controlled_sufficiently_all{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_sufficiently_all{"" if not with_branches else "_w_branches"}']] = df.apply(get_sufficiently_controlled_registers, axis=1, args=(3,), result_type="expand")
++    df[[f'controlled_fully_all{"" if not with_branches else "_w_branches"}',
++       f'n_controlled_fully_all{"" if not with_branches else "_w_branches"}']] = df.apply(get_fully_controlled_registers, axis=1, args=(3,), result_type='expand')
++
++
++    df[[f'control_sufficiently{"" if not with_branches else "_w_branches"}',
++        f'control_fully{"" if not with_branches else "_w_branches"}'
++       ]] = df.apply(get_tfp_control, axis=1, result_type="expand")
++
++
++
++
++def run(in_csv, out_csv):
++    global with_branches
++
++    integer_cols = []
++
++    for reg in get_x86_registers():
++        for with_branches in [False, True]:
++            integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_min')
++            integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_max')
++            integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_window')
++            integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_stride')
++            # integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_and_mask')
++            # integer_cols.append(f'{reg}_range{"" if not with_branches else "_with_branches"}_or_mask')
++            integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_min')
++            integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_max')
++            integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_window')
++            integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_stride')
++            # integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_and_mask')
++            # integer_cols.append(f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_or_mask')
++
++
++    # Replace 'None' with 0
++    # TODO: Hack, we should adjust the analyzer output.
++    file = open(in_csv, 'r')
++    data = file.read()
++    file.close()
++
++    df_header = pd.read_csv(StringIO(data), delimiter=';')
++    types_dict = {col: 'UInt64' if col in integer_cols else df_header[col].dtype.name for col in df_header}
++
++    # Fixes bug before commit "[ranges] Bail out if stride overflows at infer-isolated"
++    # "40c486caa400901239e0c6e5b12544da59879c8e" (inspectre-gadget)
++    for reg in get_x86_registers():
++        for with_branches in [False, True]:
++            values = list(df_header[f'{reg}_range{"" if not with_branches else "_with_branches"}_stride'].unique())
++            values += list(df_header[f'{reg}_controlled_range{"" if not with_branches else "_with_branches"}_stride'].unique())
++
++            for v in values:
++                try:
++                    np.uint64(v)
++                except OverflowError as e:
++                    print(f"OverflowError for stride {reg}, replacing '{v}' by '1'")
++                    data = data.replace(v, '1')
++
++    df = pd.read_csv(StringIO(data), delimiter=';', dtype=types_dict)
++
++
++    print(f"[-] Imported {len(df)} gadgets")
++    if df.empty:
++        return
++
++    # Transform columns.
++    for i in integer_cols:
++        df[i] = df[i].fillna(0)
++
++    df['pc_as_int'] = df.apply(get_pc_as_number, axis=1)
++
++    for reg in get_x86_registers():
++        df[f'{reg}_size'] = df.apply(calc_reg_size, axis=1, args=(reg,))
++        df[f'{reg}_reg_dereferenced']= df.apply(eval_column_to_dict, axis=1, args=(f'{reg}_reg_dereferenced',))
++
++
++    # --------------------------------------------------------------------------
++    # Add results of exploitability analysis.
++    with_branches = False
++
++    print("[-] Enriching with extra info...")
++    add_extra_info(df)
++
++    print("[-] Performing exploitability analysis...")
++
++    df[ ['exploitable', 'fail_reasons'] ] = df.apply(is_exploitable, axis=1, result_type="expand")
++
++    print(f"   [+] Found {len(df[df['exploitable'] == True])} exploitable TFPs!")
++    print(f"   [+] Found {len(df[df['n_controlled_sufficiently'] >= 1]['pc'].unique())} (unique PCs) TFPs with at least one sufficiently controlled register!")
++    print(f"   [+] Found {len(df[df['n_controlled_sufficiently'] >= 1]['address'].unique())} (unique entry point) TFPs with at least one sufficiently controlled register!")
++
++    # --------------------------------------------------------------------------
++    # Add results of exploitability analysis considering branches.
++    print("[-] Enriching with extra info including branch constraints...")
++    with_branches = True
++
++    add_extra_info(df)
++
++    print("[-] Performing exploitability analysis with branches...")
++
++    df[ ['exploitable_w_branches', 'fail_reasons_w_branches'] ] = df.apply(is_exploitable, axis=1, result_type="expand")
++
++    print(f"   [+] Found {len(df[df['exploitable_w_branches'] == True])} exploitable TFPs with branches!")
++    print(f"   [+] Found {len(df[df['n_controlled_sufficiently_w_branches'] >= 1]['pc'].unique())} (unique PCs) TFPs with at least one sufficiently controlled register!")
++    print(f"   [+] Found {len(df[df['n_controlled_sufficiently_w_branches'] >= 1]['address'].unique())} (unique entry point) TFPs with at least one sufficiently controlled register!")
++
++
++
++    # Save to new file.
++    print(f"[-] Saving to {out_csv}")
++
++    df.to_csv(out_csv, sep=';', index=False)
++
++    print("[-] Done!")
